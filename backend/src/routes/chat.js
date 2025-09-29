@@ -2,6 +2,7 @@ import express from 'express';
 import { body, validationResult } from 'express-validator';
 import { chatService } from '../services/chatService.js';
 import { logger } from '../utils/logger.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -23,7 +24,7 @@ const validateChatMessage = [
 ];
 
 // POST /api/chat/message - Send a message to the RAG system
-router.post('/message', validateChatMessage, async (req, res) => {
+router.post('/message', protect, validateChatMessage, async (req, res) => {
   try {
     // Check validation results
     const errors = validationResult(req);
@@ -35,8 +36,10 @@ router.post('/message', validateChatMessage, async (req, res) => {
     }
 
     const { message, sessionId, context } = req.body;
+    const userId = req.user._id; // Get userId from authenticated user
     
     logger.info('Chat message received', {
+      userId,
       sessionId,
       messageLength: message.length,
       hasContext: !!context
@@ -44,6 +47,7 @@ router.post('/message', validateChatMessage, async (req, res) => {
 
     // Process the message through the RAG system
     const response = await chatService.processMessage(message, {
+      userId,
       sessionId,
       context,
       timestamp: new Date().toISOString()
@@ -72,7 +76,7 @@ router.post('/message', validateChatMessage, async (req, res) => {
 });
 
 // POST /api/chat/stream - Stream a message response (for real-time chat)
-router.post('/stream', validateChatMessage, async (req, res) => {
+router.post('/stream', protect, validateChatMessage, async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -83,6 +87,7 @@ router.post('/stream', validateChatMessage, async (req, res) => {
     }
 
     const { message, sessionId, context } = req.body;
+    const userId = req.user._id; // Get userId from authenticated user
     
     // Set up Server-Sent Events
     res.writeHead(200, {
@@ -102,6 +107,7 @@ router.post('/stream', validateChatMessage, async (req, res) => {
 
     // Process message with streaming
     await chatService.processMessageStream(message, {
+      userId,
       sessionId,
       context,
       onChunk: (chunk) => {
@@ -151,12 +157,13 @@ router.post('/stream', validateChatMessage, async (req, res) => {
 });
 
 // GET /api/chat/history/:sessionId - Get chat history for a session
-router.get('/history/:sessionId', async (req, res) => {
+router.get('/history/:sessionId', protect, async (req, res) => {
   try {
     const { sessionId } = req.params;
     const { limit = 50, offset = 0 } = req.query;
+    const userId = req.user._id;
 
-    const history = await chatService.getChatHistory(sessionId, {
+    const history = await chatService.getChatHistory(sessionId, userId, {
       limit: parseInt(limit),
       offset: parseInt(offset)
     });
@@ -182,11 +189,12 @@ router.get('/history/:sessionId', async (req, res) => {
 });
 
 // DELETE /api/chat/history/:sessionId - Clear chat history for a session
-router.delete('/history/:sessionId', async (req, res) => {
+router.delete('/history/:sessionId', protect, async (req, res) => {
   try {
     const { sessionId } = req.params;
+    const userId = req.user._id;
     
-    await chatService.clearChatHistory(sessionId);
+    await chatService.clearChatHistory(sessionId, userId);
     
     res.json({
       success: true,
@@ -203,12 +211,13 @@ router.delete('/history/:sessionId', async (req, res) => {
   }
 });
 
-// GET /api/chat/sessions - Get all chat sessions
-router.get('/sessions', async (req, res) => {
+// GET /api/chat/sessions - Get all chat sessions for current user
+router.get('/sessions', protect, async (req, res) => {
   try {
     const { limit = 20, offset = 0 } = req.query;
+    const userId = req.user._id;
     
-    const sessions = await chatService.getChatSessions({
+    const sessions = await chatService.getChatSessions(userId, {
       limit: parseInt(limit),
       offset: parseInt(offset)
     });
@@ -228,6 +237,59 @@ router.get('/sessions', async (req, res) => {
     res.status(500).json({
       error: 'Failed to fetch chat sessions',
       message: 'An error occurred while retrieving chat sessions.'
+    });
+  }
+});
+
+// GET /api/chat/user/history - Get all chat history for current user across all sessions
+router.get('/user/history', protect, async (req, res) => {
+  try {
+    const { limit = 50, offset = 0, sessionId } = req.query;
+    const userId = req.user._id;
+    
+    const history = await chatService.getUserChatHistory(userId, {
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      sessionId: sessionId || null
+    });
+
+    res.json({
+      success: true,
+      data: {
+        messages: history.messages,
+        totalCount: history.totalCount,
+        hasMore: history.hasMore
+      }
+    });
+
+  } catch (error) {
+    logger.error('Error fetching user chat history:', error);
+    
+    res.status(500).json({
+      error: 'Failed to fetch user chat history',
+      message: 'An error occurred while retrieving your chat history.'
+    });
+  }
+});
+
+// DELETE /api/chat/user/history - Clear all chat history for current user
+router.delete('/user/history', protect, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    
+    await chatService.clearUserChatHistory(userId);
+    
+    res.json({
+      success: true,
+      message: 'All chat history cleared successfully'
+    });
+
+  } catch (error) {
+    logger.error('Error clearing user chat history:', error);
+    
+    res.status(500).json({
+      error: 'Failed to clear chat history',
+      message: 'An error occurred while clearing your chat history.'
     });
   }
 });
