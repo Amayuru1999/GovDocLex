@@ -94,7 +94,7 @@ function MainChat() {
 
       // Use the new Node.js backend API
       const res = await axios.post(
-        `${import.meta.env.VITE_SERVER_API}/api/chat/message`,
+        `${import.meta.env.VITE_SERVER_API}/chat/message`,
         {
           message: message,
           sessionId: sessionId || undefined,

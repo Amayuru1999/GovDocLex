@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSignOutAlt } from "react-icons/fa";
-// import sidebaricon from "../assets/images/sidebaricon.png";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 import { toast } from "react-toastify";
 
 type SidebarProps = {
@@ -22,15 +23,40 @@ const previousItems = [
   "Online Business Ideas",
 ];
 
+const MySwal = withReactContent(Swal);
+
 export default function Sidebar({ sidebarOpen, toggleSidebar }: SidebarProps) {
   const [showToday, setShowToday] = useState(true);
   const [showPrevious, setShowPrevious] = useState(true);
   const navigate = useNavigate();
 
   const handleSignOut = () => {
-    localStorage.removeItem("token");
-    toast.success("Signed out successfully!");
-    navigate("/signin");
+    MySwal.fire({
+      title: "Are you sure?",
+      text: "Do you want to sign out?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#0a1117",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Yes, sign out",
+      cancelButtonText: "Cancel",
+      backdrop: `
+        rgba(0,0,0,0.6)
+        url("/spinner.gif")
+        center top
+        no-repeat
+        blur(5px)
+      `,
+      background: "#11191f", 
+      color: "#fff", 
+      focusConfirm: false,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem("token");
+        toast.success("Signed out successfully!");
+        navigate("/signin");
+      }
+    });
   };
 
   return (
@@ -45,12 +71,11 @@ export default function Sidebar({ sidebarOpen, toggleSidebar }: SidebarProps) {
         }`}
       >
         GOVDocLex
-        <button className="" onClick={handleSignOut}>
-          <p>
-            <FaSignOutAlt />
-          </p>
+        <button onClick={handleSignOut}>
+          <FaSignOutAlt />
         </button>
       </div>
+
       <div className="flex-1 flex flex-col justify-between">
         <div>
           <div>

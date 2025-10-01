@@ -105,6 +105,8 @@ class RAGService {
 
     } catch (error) {
       const processingTime = Date.now() - startTime;
+
+      console.error("Query failed:", error.response?.data || error.message);
       
       logger.error('RAG query failed:', {
         error: error.message,

@@ -7,16 +7,21 @@ import json
 from pathlib import Path
 from datetime import datetime
 from typing import List, Tuple
+
 # from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
+from neo4j import GraphDatabase
 
 # -----------------------
 # Config
 # -----------------------
 PROCESSED_LOG = "processed_collections.json"
+
+driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "YOUR_PASSWORD"))
+
 
 # -----------------------
 # PDF Text Extraction
@@ -36,10 +41,60 @@ def extract_text_from_pdf(pdf_path: str) -> List[Tuple[int, str]]:
         logging.error(f"Error extracting text from {pdf_path}: {e}")
         return []
 
+
 # -----------------------
 # PDF Processing (Dynamic Paragraph Chunking)
 # -----------------------
-def process_pdf(pdf_path: str, min_paragraph_length: int = 50, max_paragraph_length: int = 1000):
+# def process_pdf(
+#     pdf_path: str, min_paragraph_length: int = 50, max_paragraph_length: int = 1000
+# ):
+#     """
+#     Convert one PDF → chunks + metadata + ids using paragraph-based dynamic chunking.
+#     min_paragraph_length: skip tiny paragraphs
+#     max_paragraph_length: if paragraph is too big, split it further
+#     """
+#     pages = extract_text_from_pdf(pdf_path)
+#     doc_id = uuid.uuid5(uuid.NAMESPACE_URL, Path(pdf_path).resolve().as_uri()).hex
+#     upload_date = datetime.now().strftime("%Y-%m-%d")
+
+#     chunks, metadatas, ids = [], [], []
+
+#     for page_num, text in pages:
+#         paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
+#         for i, paragraph in enumerate(paragraphs):
+#             if len(paragraph) < min_paragraph_length:
+#                 continue
+
+#             # Further split large paragraphs
+#             if len(paragraph) > max_paragraph_length:
+#                 splitter = RecursiveCharacterTextSplitter(
+#                     chunk_size=max_paragraph_length, chunk_overlap=50
+#                 )
+#                 sub_chunks = splitter.split_text(paragraph)
+#             else:
+#                 sub_chunks = [paragraph]
+
+#             for j, chunk in enumerate(sub_chunks):
+#                 chunks.append(chunk)
+#                 metadatas.append(
+#                     {
+#                         "source": Path(pdf_path).name,
+#                         "path": str(Path(pdf_path).resolve()),
+#                         "page": page_num,
+#                         "chunk_id": f"{i}-{j}",
+#                         "document_id": doc_id,
+#                         "upload_date": upload_date,
+#                     }
+#                 )
+#                 ids.append(f"{doc_id}-p{page_num}-c{i}-{j}")
+
+                
+
+#     return chunks, metadatas, ids
+
+def process_pdf(
+    pdf_path: str, min_paragraph_length: int = 50, max_paragraph_length: int = 1000
+):
     """
     Convert one PDF → chunks + metadata + ids using paragraph-based dynamic chunking.
     min_paragraph_length: skip tiny paragraphs
@@ -59,42 +114,61 @@ def process_pdf(pdf_path: str, min_paragraph_length: int = 50, max_paragraph_len
 
             # Further split large paragraphs
             if len(paragraph) > max_paragraph_length:
-                splitter = RecursiveCharacterTextSplitter(chunk_size=max_paragraph_length, chunk_overlap=50)
+                splitter = RecursiveCharacterTextSplitter(
+                    chunk_size=max_paragraph_length, chunk_overlap=50
+                )
                 sub_chunks = splitter.split_text(paragraph)
             else:
                 sub_chunks = [paragraph]
 
             for j, chunk in enumerate(sub_chunks):
                 chunks.append(chunk)
-                metadatas.append({
-                    "source": Path(pdf_path).name,
-                    "path": str(Path(pdf_path).resolve()),
-                    "page": page_num,
-                    "chunk_id": f"{i}-{j}",
-                    "document_id": doc_id,
-                    "upload_date": upload_date
-                })
+                metadatas.append(
+                    {
+                        "source": Path(pdf_path).name,
+                        "path": str(Path(pdf_path).resolve()),
+                        "page": page_num,
+                        "chunk_id": f"{i}-{j}",
+                        "document_id": doc_id,
+                        "upload_date": upload_date,
+                    }
+                )
                 ids.append(f"{doc_id}-p{page_num}-c{i}-{j}")
 
+    # ✅ Call Neo4j graph function ONCE after collecting all chunks
+    pdf_name = Path(pdf_path).stem  # Extract file name without extension
+    add_nodes_edges_to_graph(pdf_name, chunks, metadatas)
+
     return chunks, metadatas, ids
+
+
+
+
 
 # -----------------------
 # Collection Builder
 # -----------------------
 def build_collection(pdf_dir: str, persist_dir: str, collection_name: str):
     """Process all PDFs in a directory into a Chroma collection"""
-    pdf_files = [os.path.join(pdf_dir, f) for f in os.listdir(pdf_dir) if f.lower().endswith(".pdf")]
+    pdf_files = [
+        os.path.join(pdf_dir, f)
+        for f in os.listdir(pdf_dir)
+        if f.lower().endswith(".pdf")
+    ]
     if not pdf_files:
         logging.warning(f"No PDFs found in {pdf_dir}")
         return
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    embeddings = HuggingFaceEmbeddings(model_name="nlpaueb/legal-bert-base-uncased",
-                                       model_kwargs={"device": device})
+    embeddings = HuggingFaceEmbeddings(
+        model_name="nlpaueb/legal-bert-base-uncased", model_kwargs={"device": device}
+    )
 
-    vector_db = Chroma(persist_directory=persist_dir,
-                       collection_name=collection_name,
-                       embedding_function=embeddings)
+    vector_db = Chroma(
+        persist_directory=persist_dir,
+        collection_name=collection_name,
+        embedding_function=embeddings,
+    )
 
     all_chunks, all_metas, all_ids = [], [], []
     for pdf_path in pdf_files:
@@ -106,7 +180,10 @@ def build_collection(pdf_dir: str, persist_dir: str, collection_name: str):
 
     if all_chunks:
         vector_db.add_texts(all_chunks, metadatas=all_metas, ids=all_ids)
-        logging.info(f"✅ Added {len(all_chunks)} chunks to collection: {collection_name}")
+        logging.info(
+            f"✅ Added {len(all_chunks)} chunks to collection: {collection_name}"
+        )
+
 
 # -----------------------
 # Master Runner
@@ -118,11 +195,13 @@ def load_processed_log(persist_root: str) -> dict:
             return json.load(f)
     return {}
 
+
 def save_processed_log(persist_root: str, data: dict):
     os.makedirs(persist_root, exist_ok=True)
     log_path = Path(persist_root) / PROCESSED_LOG
     with open(log_path, "w") as f:
         json.dump(data, f, indent=2)
+
 
 def process_all_acts(base_folder: str, persist_root: str):
     """Iterate over Acts and build collections only for new Acts"""
@@ -136,20 +215,59 @@ def process_all_acts(base_folder: str, persist_root: str):
         safe_name = act_name.replace(" ", "_")
         collections = {
             "base": f"{safe_name}-Base",
-            "amendment": f"{safe_name}-Amendment"
+            "amendment": f"{safe_name}-Amendment",
         }
 
         for folder_type, collection_name in collections.items():
             folder_path = os.path.join(act_path, folder_type)
             if os.path.exists(folder_path):
                 if collection_name in processed:
-                    logging.info(f"Skipping already processed collection: {collection_name}")
+                    logging.info(
+                        f"Skipping already processed collection: {collection_name}"
+                    )
                     continue
 
                 build_collection(folder_path, persist_root, collection_name)
                 processed[collection_name] = True
 
     save_processed_log(persist_root, processed)
+
+def add_nodes_edges_to_graph(pdf_name, chunks, metadatas):
+    with driver.session() as session:
+        # Create Act node with optional type
+        session.run("MERGE (a:Act {name:$name})", name=pdf_name)
+
+        # Create Section nodes and link them to Act
+        for chunk, meta in zip(chunks, metadatas):
+            section_name = f"{pdf_name}-page{meta['page']}-chunk{meta['chunk_id']}"
+            embedding_id = f"{meta['document_id']}-p{meta['page']}-c{meta['chunk_id']}"
+
+            session.run(
+                """
+                MERGE (s:Section {
+                    name:$sname,
+                    text:$text,
+                    embedding_id:$eid,
+                    page:$page,
+                    source:$source
+                })
+                """,
+                sname=section_name,
+                text=chunk,
+                eid=embedding_id,
+                page=meta['page'],
+                source=meta['source']
+            )
+
+            # Link Section to Act
+            session.run(
+                """
+                MATCH (a:Act {name:$act_name}), (s:Section {name:$sname})
+                MERGE (a)-[:CONTAINS]->(s)
+                """,
+                act_name=pdf_name,
+                sname=section_name
+            )
 
 # -----------------------
 # Main
@@ -161,13 +279,6 @@ if __name__ == "__main__":
 
     process_all_acts(base_folder, persist_root)
     logging.info("✅ Finished embedding all Acts into ChromaDB")
-
-
-
-
-
-
-
 
 
 # import os
@@ -203,8 +314,6 @@ if __name__ == "__main__":
 #     except Exception as e:
 #         logging.error(f"Error extracting text from {pdf_path}: {e}")
 #         return []
-
-
 
 
 # # -----------------------

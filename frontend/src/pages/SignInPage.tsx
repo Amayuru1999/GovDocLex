@@ -6,6 +6,7 @@ import signin from "../assets/images/sign.jpg";
 import footerbackheight from "../assets/images/footerbackheight.png";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { ClipLoader } from "react-spinners";
 
 interface LoginResponse {
   token: string;
@@ -26,31 +27,6 @@ export default function SignInPage() {
 
   const navigate = useNavigate();
 
-  // const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-  //   setError("");
-
-  //   try {
-  //     const response = await axios.post<LoginResponse>(
-  //       `${import.meta.env.VITE_SERVER_API}/signin`,
-  //       { email, password }
-  //     );
-  //     toast.success('Signed in successfully!');
-  //     const { token } = response.data;
-  //     localStorage.setItem("token", token);
-  //     navigate("/chatbot");
-  //   } catch (err: any) {
-  //     setError(
-  //       err.response?.data?.message || "Login failed. Please try again."
-  //     );
-
-  //     toast.error('Invalid credentials');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -63,20 +39,13 @@ export default function SignInPage() {
       );
 
       toast.success("Signed in successfully!");
-
       const { token, user } = response.data;
-
       localStorage.setItem("token", token);
-
       localStorage.setItem("userId", user._id);
-
-      console.log("User info:", user._id);
 
       navigate("/chatbot");
     } catch (err: any) {
-      setError(
-        err.response?.data?.message || "Login failed. Please try again."
-      );
+      setError(err.response?.data?.message || "Login failed. Please try again.");
       toast.error("Invalid credentials");
     } finally {
       setLoading(false);
@@ -84,14 +53,14 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gray-50 max-w-[1920px] mx-auto">
+    <div className="min-h-screen flex flex-col md:flex-row bg-gray-50 max-w-[1920px] mx-auto relative">
       {/* Left side: Login form */}
       <div className="flex-1 flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
+        <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 relative z-10">
           <div className="mb-6 flex items-center gap-2">
             <button
               className="text-2xl font-extrabold text-green-800 cursor-pointer"
-              onClick={() => (window.location.href = "/")}
+              onClick={() => navigate("/")}
               aria-label="Go back to home"
             >
               <FaArrowLeft className="w-4 text-[#0a1117]" />
@@ -154,25 +123,19 @@ export default function SignInPage() {
                 <input type="checkbox" className="accent-green-800" />
                 Remember me
               </label>
-              <a href="#" className="text-sm text-green-800 hover:underline">
+              <a href="/forget-password" className="text-sm text-green-800 hover:underline">
                 Forgot Password?
               </a>
             </div>
 
-            {error && (
-              <div className="text-red-600 text-sm font-medium">{error}</div>
-            )}
+            {error && <div className="text-red-600 text-sm font-medium">{error}</div>}
 
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2 rounded font-semibold transition ${
-                loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-[#0a1117] hover:bg-green-900 text-white"
-              }`}
+              className={`w-full py-2 rounded font-semibold transition bg-[#0a1117] hover:bg-green-900 text-white flex items-center justify-center`}
             >
-              {loading ? "Signing in..." : "Sign in"}
+              Sign in
             </button>
           </form>
 
@@ -182,43 +145,30 @@ export default function SignInPage() {
             <div className="flex-1 border-t border-gray-200" />
           </div>
 
-          <div className="space-y-3">
-            <GoogleLogin
-              onSuccess={async (credentialResponse) => {
-                console.log(
-                  "Google credential:",
-                  credentialResponse.credential
+          <GoogleLogin
+            onSuccess={async (credentialResponse) => {
+              try {
+                const response = await axios.post(
+                  `${import.meta.env.VITE_SERVER_API}/google-auth`,
+                  { credential: credentialResponse.credential }
                 );
-                try {
-                  const response = await axios.post(
-                    `${import.meta.env.VITE_SERVER_API}/google-auth`,
-                    { credential: credentialResponse.credential }
-                  );
-
-                  localStorage.setItem("token", response.data.token);
-
-                  const userId = response.data.user._id;
-                  localStorage.setItem("userId", userId);
-
-                  console.log("Logged in user ID:", userId);
-
-                  navigate("/chatbot");
-                } catch (err: any) {
-                  setError("Google login failed. Please try again.");
-                  console.error(err);
-                }
-              }}
-              onError={() => {
+                localStorage.setItem("token", response.data.token);
+                localStorage.setItem("userId", response.data.user._id);
+                navigate("/chatbot");
+              } catch (err: any) {
                 setError("Google login failed. Please try again.");
-              }}
-              useOneTap
-              size="large"
-              shape="rectangular"
-              text="continue_with"
-              width={350}
-              logo_alignment="left"
-            />
-          </div>
+              }
+            }}
+            onError={() => {
+              setError("Google login failed. Please try again.");
+            }}
+            useOneTap
+            size="large"
+            shape="rectangular"
+            text="continue_with"
+            width={350}
+            logo_alignment="left"
+          />
         </div>
       </div>
 
@@ -231,24 +181,27 @@ export default function SignInPage() {
             className="w-full h-96 object-cover rounded-xl mb-4"
           />
         </div>
-
         <div className="flex items-center justify-center flex-col text-center">
           <h3 className="text-4xl font-semibold mb-3">
             Welcome to the Government Document Extraction Portal
           </h3>
           <p className="text-gray-200 max-w-lg text-xl">
-            This secure platform enables authorized users to upload, extract,
-            and manage critical information from official documents with speed
-            and accuracy.
+            This secure platform enables authorized users to upload, extract, and manage critical information from official documents with speed and accuracy.
           </p>
         </div>
-
         <img
           src={footerbackheight}
           alt="Background"
           className="absolute bottom-0 left-0 w-full object-cover opacity-50"
         />
       </div>
+
+      {/* Fullscreen Loader Overlay */}
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <ClipLoader size={50} color="#fff" />
+        </div>
+      )}
     </div>
   );
 }
