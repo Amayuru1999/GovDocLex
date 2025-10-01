@@ -6,7 +6,7 @@ const FooterSection: React.FC = () => {
     <footer className="bg-[#0a1117] text-white py-16 px-4  relative">
       <div className="max-w-[1920px] mx-auto flex flex-col md:justify-center">
         <div className="flex-1 flex justify-center">
-          <div className="text-sm lg:text-base flex gap-6 sm:gap-10 lg:gap-20 w-full justify-center sm:pb-4 lg:pb-6 border">
+          <div className="text-sm lg:text-base flex gap-6 sm:gap-10 lg:gap-20 w-full justify-center sm:pb-4 lg:pb-6">
             <a href="#home" className="hover:underline">
               Home
             </a>
