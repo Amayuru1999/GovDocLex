@@ -6,6 +6,7 @@ import { Button } from "../ui/Button";
 import { Card, CardContent } from "../ui/Card";
 import axios from "axios";
 import { FormEvent } from "react";
+import { chatService } from "../../services/chatService";
 
 interface ChatEntry {
   user: string;
@@ -21,7 +22,12 @@ interface User {
   name?: string;
 }
 
-function MainChat() {
+interface MainChatProps {
+  sessionId?: string | null;
+  onSessionChange?: (sessionId: string) => void;
+}
+
+function MainChat({ sessionId: propSessionId, onSessionChange }: MainChatProps) {
   const quickActions = [
     {
       label: "Government structure",
@@ -47,11 +53,12 @@ function MainChat() {
 
   const [message, setMessage] = useState("");
   const [responses, setResponses] = useState<ChatEntry[]>([]);
-  const [sessionId, setSessionId] = useState<string | null>(null);
-
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [user, setUser] = useState<User | null>(null);
+
+  // Use prop sessionId instead of internal state
+  const currentSessionId = propSessionId;
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -79,6 +86,36 @@ function MainChat() {
     fetchUser();
   }, []);
 
+  // Load chat history for current session if exists
+  useEffect(() => {
+    const loadChatHistory = async () => {
+      if (currentSessionId && chatService.isAuthenticated()) {
+        try {
+          const history = await chatService.getChatHistory(currentSessionId);
+          if (history.success && history.data.messages.length > 0) {
+            const formattedMessages: ChatEntry[] = history.data.messages.map(msg => ({
+              user: msg.userMessage,
+              bot: msg.botResponse,
+              sources: msg.sources
+            }));
+            setResponses(formattedMessages);
+          } else {
+            // Clear responses for new/empty sessions
+            setResponses([]);
+          }
+        } catch (err) {
+          console.error("Failed to load chat history:", err);
+          setResponses([]);
+        }
+      } else {
+        // Clear responses when no session
+        setResponses([]);
+      }
+    };
+
+    loadChatHistory();
+  }, [currentSessionId]);
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!message.trim()) return;
@@ -87,25 +124,26 @@ function MainChat() {
     setError("");
 
     try {
+      // Check if user is authenticated
+      if (!chatService.isAuthenticated()) {
+        setError("You must be logged in to chat. Please log in first.");
+        return;
+      }
+
       setResponses((prev) => [
         ...prev,
         { user: message, bot: "", sources: [] },
       ]);
 
-      // Use the new Node.js backend API
-      const res = await axios.post(
-        `${import.meta.env.VITE_SERVER_API}/chat/message`,
-        {
-          message: message,
-          sessionId: sessionId || undefined,
-        }
-      );
-
-      if (res.status !== 200) throw new Error("Failed to get response");
-
-      const botResponse = res.data;
+      // Use the chat service
+      const botResponse = await chatService.sendMessage(message, currentSessionId || undefined);
 
       console.log("Bot response:", botResponse.data.response);
+
+      // Update sessionId if it was created by the backend
+      if (botResponse.data.sessionId && !currentSessionId && onSessionChange) {
+        onSessionChange(botResponse.data.sessionId);
+      }
 
       setResponses((prev) => {
         const last = prev[prev.length - 1];
@@ -119,7 +157,19 @@ function MainChat() {
         ];
       });
     } catch (err) {
-      setError("Failed to send message. Please try again.");
+      // Handle specific error messages
+      if (err instanceof Error) {
+        if (err.message.includes("No authentication token found") || 
+            err.message.includes("Not authorized")) {
+          setError("Session expired. Please log in again.");
+          // Optionally redirect to login or clear localStorage
+          chatService.handleAuthError();
+        } else {
+          setError(err.message);
+        }
+      } else {
+        setError("Failed to send message. Please try again.");
+      }
       console.error("Error:", err);
     } finally {
       setIsLoading(false);
@@ -154,7 +204,15 @@ function MainChat() {
             )}
           </div>
         ))}
-        {error && <div className="text-red-400 text-sm mb-2">{error}</div>}
+        {error && (
+          <div className={`text-sm mb-2 p-3 rounded ${
+            error.includes("log in") || error.includes("expired") 
+              ? "text-yellow-400 bg-yellow-900/20 border border-yellow-600/30" 
+              : "text-red-400 bg-red-900/20 border border-red-600/30"
+          }`}>
+            {error}
+          </div>
+        )}
       </div>
 
       {/* Message box */}

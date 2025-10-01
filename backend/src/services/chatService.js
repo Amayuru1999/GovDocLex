@@ -1,38 +1,45 @@
 import { ragService } from './ragService.js';
 import { logger } from '../utils/logger.js';
 import { v4 as uuidv4 } from 'uuid';
+import Chat from '../models/Chat.js';
+import User from '../models/User.js';
+import mongoose from 'mongoose';
 
 class ChatService {
   constructor() {
-    this.sessions = new Map(); // In-memory storage for demo purposes
-    this.chatHistory = new Map(); // In-memory storage for demo purposes
+    // No need for in-memory storage anymore
   }
 
   async processMessage(message, options = {}) {
     const startTime = Date.now();
     const sessionId = options.sessionId || uuidv4();
+    const userId = options.userId;
     
     try {
       logger.info('Processing chat message', {
+        userId,
         sessionId,
         messageLength: message.length
       });
 
-      // Get or create session
-      let session = this.sessions.get(sessionId);
-      if (!session) {
-        session = {
-          id: sessionId,
-          createdAt: new Date().toISOString(),
-          lastActivity: new Date().toISOString(),
-          messageCount: 0
-        };
-        this.sessions.set(sessionId, session);
+      // Validate user exists
+      if (userId) {
+        const user = await User.findById(userId);
+        if (!user) {
+          throw new Error('User not found');
+        }
       }
 
-      // Update session activity
-      session.lastActivity = new Date().toISOString();
-      session.messageCount++;
+      // Save user message to database
+      if (userId) {
+        await Chat.create({
+          userId,
+          sessionId,
+          role: 'user',
+          content: message,
+          context: options.context || {}
+        });
+      }
 
       // Process through RAG system
       const ragResponse = await ragService.query(message, {
@@ -43,21 +50,20 @@ class ChatService {
 
       const processingTime = Date.now() - startTime;
 
-      // Store in chat history
-      const chatEntry = {
-        id: uuidv4(),
-        sessionId,
-        userMessage: message,
-        botResponse: ragResponse.answer,
-        sources: ragResponse.sources || [],
-        timestamp: new Date().toISOString(),
-        processingTime
-      };
-
-      if (!this.chatHistory.has(sessionId)) {
-        this.chatHistory.set(sessionId, []);
+      // Save assistant response to database
+      if (userId) {
+        await Chat.create({
+          userId,
+          sessionId,
+          role: 'assistant',
+          content: ragResponse.answer,
+          context: {
+            sources: ragResponse.sources || [],
+            processingTime,
+            ...options.context
+          }
+        });
       }
-      this.chatHistory.get(sessionId).push(chatEntry);
 
       // Return response
       return {
@@ -71,7 +77,7 @@ class ChatService {
     } catch (error) {
       logger.error('Error processing chat message:', error);
       
-      return {
+      const errorResponse = {
         answer: 'I apologize, but I encountered an error while processing your message. Please try again later.',
         sources: [],
         sessionId,
@@ -79,34 +85,61 @@ class ChatService {
         processingTime: Date.now() - startTime,
         error: error.message
       };
+
+      // Save error response if we have a user
+      if (userId) {
+        try {
+          await Chat.create({
+            userId,
+            sessionId,
+            role: 'assistant',
+            content: errorResponse.answer,
+            context: {
+              error: error.message,
+              processingTime: errorResponse.processingTime
+            }
+          });
+        } catch (saveError) {
+          logger.error('Error saving error response to database:', saveError);
+        }
+      }
+
+      return errorResponse;
     }
   }
 
   async processMessageStream(message, options = {}) {
     const startTime = Date.now();
     const sessionId = options.sessionId || uuidv4();
+    const userId = options.userId;
     
     try {
       logger.info('Processing streaming chat message', {
+        userId,
         sessionId,
         messageLength: message.length
       });
 
-      // Get or create session
-      let session = this.sessions.get(sessionId);
-      if (!session) {
-        session = {
-          id: sessionId,
-          createdAt: new Date().toISOString(),
-          lastActivity: new Date().toISOString(),
-          messageCount: 0
-        };
-        this.sessions.set(sessionId, session);
+      // Validate user exists
+      if (userId) {
+        const user = await User.findById(userId);
+        if (!user) {
+          throw new Error('User not found');
+        }
       }
 
-      // Update session activity
-      session.lastActivity = new Date().toISOString();
-      session.messageCount++;
+      // Save user message to database
+      if (userId) {
+        await Chat.create({
+          userId,
+          sessionId,
+          role: 'user',
+          content: message,
+          context: options.context || {}
+        });
+      }
+
+      let fullResponse = '';
 
       // Process through RAG system with streaming
       await ragService.queryStream(message, {
@@ -114,6 +147,7 @@ class ChatService {
         maxResults: 5,
         includeSources: true,
         onChunk: (chunk) => {
+          fullResponse += chunk;
           if (options.onChunk) {
             options.onChunk(chunk);
           }
@@ -121,26 +155,29 @@ class ChatService {
         onComplete: async (ragResponse) => {
           const processingTime = Date.now() - startTime;
 
-          // Store in chat history
-          const chatEntry = {
-            id: uuidv4(),
-            sessionId,
-            userMessage: message,
-            botResponse: ragResponse.answer,
-            sources: ragResponse.sources || [],
-            timestamp: new Date().toISOString(),
-            processingTime
-          };
-
-          if (!this.chatHistory.has(sessionId)) {
-            this.chatHistory.set(sessionId, []);
+          // Save assistant response to database
+          if (userId) {
+            try {
+              await Chat.create({
+                userId,
+                sessionId,
+                role: 'assistant',
+                content: ragResponse.answer || fullResponse,
+                context: {
+                  sources: ragResponse.sources || [],
+                  processingTime,
+                  ...options.context
+                }
+              });
+            } catch (saveError) {
+              logger.error('Error saving streaming response to database:', saveError);
+            }
           }
-          this.chatHistory.get(sessionId).push(chatEntry);
 
           // Call completion callback
           if (options.onComplete) {
             options.onComplete({
-              answer: ragResponse.answer,
+              answer: ragResponse.answer || fullResponse,
               sources: ragResponse.sources || [],
               sessionId,
               timestamp: new Date().toISOString(),
@@ -148,9 +185,27 @@ class ChatService {
             });
           }
         },
-        onError: (error) => {
+        onError: async (error) => {
           logger.error('Error in streaming chat:', error);
           
+          // Save error response
+          if (userId) {
+            try {
+              await Chat.create({
+                userId,
+                sessionId,
+                role: 'assistant',
+                content: 'I encountered an error while processing your message. Please try again.',
+                context: {
+                  error: error.message,
+                  processingTime: Date.now() - startTime
+                }
+              });
+            } catch (saveError) {
+              logger.error('Error saving stream error to database:', saveError);
+            }
+          }
+
           if (options.onError) {
             options.onError(error);
           }
@@ -166,28 +221,53 @@ class ChatService {
     }
   }
 
-  async getChatHistory(sessionId, options = {}) {
+  async getChatHistory(sessionId, userId, options = {}) {
     try {
       const limit = options.limit || 50;
       const offset = options.offset || 0;
       
-      const history = this.chatHistory.get(sessionId) || [];
-      const totalCount = history.length;
+      // Build query - include userId for security
+      const query = { sessionId };
+      if (userId) {
+        query.userId = userId;
+      }
       
-      const messages = history
-        .slice(offset, offset + limit)
-        .map(entry => ({
-          id: entry.id,
-          userMessage: entry.userMessage,
-          botResponse: entry.botResponse,
-          sources: entry.sources,
-          timestamp: entry.timestamp,
-          processingTime: entry.processingTime
-        }));
+      // Get total count
+      const totalCount = await Chat.countDocuments(query);
+      
+      // Get messages with pagination
+      const messages = await Chat.find(query)
+        .sort({ createdAt: 1 }) // Sort by creation time ascending
+        .skip(offset)
+        .limit(limit)
+        .populate('userId', 'name email')
+        .lean();
+
+      // Format messages for response
+      const formattedMessages = messages.reduce((acc, msg) => {
+        if (msg.role === 'user') {
+          // Start a new conversation pair
+          acc.push({
+            id: msg._id,
+            userMessage: msg.content,
+            botResponse: null,
+            sources: [],
+            timestamp: msg.createdAt,
+            processingTime: null
+          });
+        } else if (msg.role === 'assistant' && acc.length > 0) {
+          // Complete the last conversation pair
+          const lastEntry = acc[acc.length - 1];
+          lastEntry.botResponse = msg.content;
+          lastEntry.sources = msg.context?.sources || [];
+          lastEntry.processingTime = msg.context?.processingTime || null;
+        }
+        return acc;
+      }, []);
 
       return {
-        messages,
-        totalCount,
+        messages: formattedMessages,
+        totalCount: Math.ceil(totalCount / 2), // Divide by 2 since we have user+assistant pairs
         hasMore: offset + limit < totalCount
       };
 
@@ -201,10 +281,16 @@ class ChatService {
     }
   }
 
-  async clearChatHistory(sessionId) {
+  async clearChatHistory(sessionId, userId) {
     try {
-      this.chatHistory.delete(sessionId);
-      logger.info('Chat history cleared for session', { sessionId });
+      // Build query - include userId for security
+      const query = { sessionId };
+      if (userId) {
+        query.userId = userId;
+      }
+
+      await Chat.deleteMany(query);
+      logger.info('Chat history cleared for session', { sessionId, userId });
       return true;
     } catch (error) {
       logger.error('Error clearing chat history:', error);
@@ -212,26 +298,62 @@ class ChatService {
     }
   }
 
-  async getChatSessions(options = {}) {
+  async getChatSessions(userId, options = {}) {
     try {
       const limit = options.limit || 20;
       const offset = options.offset || 0;
       
-      const sessions = Array.from(this.sessions.values())
-        .sort((a, b) => new Date(b.lastActivity) - new Date(a.lastActivity))
-        .slice(offset, offset + limit)
-        .map(session => ({
-          id: session.id,
-          createdAt: session.createdAt,
-          lastActivity: session.lastActivity,
-          messageCount: session.messageCount,
-          hasHistory: this.chatHistory.has(session.id)
-        }));
+      // Get unique sessions for the user with latest message info
+      const pipeline = [
+        { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+        { 
+          $group: {
+            _id: '$sessionId',
+            firstMessage: { $first: '$createdAt' },
+            lastMessage: { $last: '$createdAt' },
+            messageCount: { $sum: 1 },
+            lastUserMessage: { 
+              $last: { 
+                $cond: [
+                  { $eq: ['$role', 'user'] }, 
+                  '$content', 
+                  null
+                ] 
+              } 
+            }
+          }
+        },
+        { $sort: { lastMessage: -1 } },
+        { $skip: offset },
+        { $limit: limit }
+      ];
+
+      const sessions = await Chat.aggregate(pipeline);
+      
+      // Get total count of unique sessions
+      const totalCountPipeline = [
+        { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+        { $group: { _id: '$sessionId' } },
+        { $count: 'total' }
+      ];
+      
+      const countResult = await Chat.aggregate(totalCountPipeline);
+      const totalCount = countResult.length > 0 ? countResult[0].total : 0;
+
+      const formattedSessions = sessions.map(session => ({
+        id: session._id,
+        sessionId: session._id,
+        createdAt: session.firstMessage,
+        lastActivity: session.lastMessage,
+        messageCount: Math.ceil(session.messageCount / 2), // Divide by 2 for user+assistant pairs
+        lastUserMessage: session.lastUserMessage,
+        hasHistory: true
+      }));
 
       return {
-        sessions,
-        totalCount: this.sessions.size,
-        hasMore: offset + limit < this.sessions.size
+        sessions: formattedSessions,
+        totalCount,
+        hasMore: offset + limit < totalCount
       };
 
     } catch (error) {
@@ -244,18 +366,89 @@ class ChatService {
     }
   }
 
-  async getSessionStats() {
+  async getUserChatHistory(userId, options = {}) {
     try {
-      const totalSessions = this.sessions.size;
-      const totalMessages = Array.from(this.chatHistory.values())
-        .reduce((total, history) => total + history.length, 0);
+      const limit = options.limit || 50;
+      const offset = options.offset || 0;
+      const sessionId = options.sessionId;
       
-      const activeSessions = Array.from(this.sessions.values())
-        .filter(session => {
-          const lastActivity = new Date(session.lastActivity);
-          const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-          return lastActivity > oneHourAgo;
-        }).length;
+      // Build query
+      const query = { userId };
+      if (sessionId) {
+        query.sessionId = sessionId;
+      }
+      
+      // Get total count
+      const totalCount = await Chat.countDocuments(query);
+      
+      // Get messages with pagination
+      const messages = await Chat.find(query)
+        .sort({ createdAt: -1 }) // Sort by creation time descending for recent first
+        .skip(offset)
+        .limit(limit)
+        .lean();
+
+      return {
+        messages: messages.map(msg => ({
+          id: msg._id,
+          sessionId: msg.sessionId,
+          role: msg.role,
+          content: msg.content,
+          context: msg.context,
+          timestamp: msg.createdAt
+        })),
+        totalCount,
+        hasMore: offset + limit < totalCount
+      };
+
+    } catch (error) {
+      logger.error('Error getting user chat history:', error);
+      return {
+        messages: [],
+        totalCount: 0,
+        hasMore: false
+      };
+    }
+  }
+
+  async clearUserChatHistory(userId) {
+    try {
+      await Chat.deleteMany({ userId });
+      logger.info('All chat history cleared for user', { userId });
+      return true;
+    } catch (error) {
+      logger.error('Error clearing user chat history:', error);
+      return false;
+    }
+  }
+
+  async getSessionStats(userId = null) {
+    try {
+      const query = userId ? { userId } : {};
+      
+      // Get total unique sessions
+      const totalSessionsPipeline = [
+        { $match: query },
+        { $group: { _id: '$sessionId' } },
+        { $count: 'total' }
+      ];
+      
+      const sessionCountResult = await Chat.aggregate(totalSessionsPipeline);
+      const totalSessions = sessionCountResult.length > 0 ? sessionCountResult[0].total : 0;
+      
+      // Get total messages
+      const totalMessages = await Chat.countDocuments(query);
+      
+      // Get active sessions (last hour)
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      const activeSessionsPipeline = [
+        { $match: { ...query, createdAt: { $gte: oneHourAgo } } },
+        { $group: { _id: '$sessionId' } },
+        { $count: 'total' }
+      ];
+      
+      const activeCountResult = await Chat.aggregate(activeSessionsPipeline);
+      const activeSessions = activeCountResult.length > 0 ? activeCountResult[0].total : 0;
 
       return {
         totalSessions,
