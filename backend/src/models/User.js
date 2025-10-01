@@ -13,8 +13,9 @@ const userSchema = new Schema(
       type: String,
       required: true,
       unique: true,
-      match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, "Invalid email"],
+      match: [/^[\w.-]+@[\w.-]+\.[A-Za-z]{2,}$/, "Invalid email"],
     },
+
     password: {
       type: String,
       required: function () {
