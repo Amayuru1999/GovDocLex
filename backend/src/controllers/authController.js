@@ -3,6 +3,8 @@ import {
   localSignIn,
   googleAuth,
   findUserById,
+  requestPasswordReset,
+  resetPassword,
 } from "../services/authService.js";
 
 const localSignupController = async (req, res) => {
@@ -73,6 +75,34 @@ export const getUserByIdController = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to fetch user" });
   }
 };
+
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const result = await requestPasswordReset(email);
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+
+export const handleResetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+    const result = await resetPassword(token, password);
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+
+
+
+
 
 export {
   localSignupController as localSignup,
