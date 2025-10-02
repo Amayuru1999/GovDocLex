@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
 import User from "../models/User.js";
+import crypto from "crypto";
+import sendEmail from "../utils/sendEmail.js";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -74,4 +76,62 @@ export const googleAuth = async (googleToken) => {
 export const findUserById = async (userId) => {
   const user = await User.findById(userId).select("-password -googleId");
   return user;
+};
+
+
+
+export const requestPasswordReset = async (email) => {
+  
+  if (typeof email !== "string") {
+    throw new Error("Invalid email format");
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) throw new Error("User not found");
+
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  const resetTokenHash = crypto.createHash("sha256").update(resetToken).digest("hex");
+
+  user.resetPasswordToken = resetTokenHash;
+  user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; 
+  await user.save();
+
+  const resetLink = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+
+  await sendEmail(
+    user.email,
+    "Password Reset Request",
+    `
+    <p>You requested to reset your password.</p>
+    <p>Click this link to reset: <a href="${resetLink}">${resetLink}</a></p>
+    <p>This link will expire in 15 minutes.</p>
+    `
+  );
+
+  return { message: "Password reset email sent" };
+};
+
+
+
+export const resetPassword = async (token, newPassword) => {
+  const resetTokenHash = crypto.createHash("sha256").update(token).digest("hex");
+
+  const user = await User.findOne({
+    resetPasswordToken: resetTokenHash,
+    resetPasswordExpires: { $gt: Date.now() },
+  });
+
+  if (!user) throw new Error("Invalid or expired token");
+
+  
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  user.password = hashedPassword;
+
+
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+
+  await user.save();
+
+  return { message: "Password has been reset successfully" };
 };

@@ -1,26 +1,21 @@
 // src/models/User.js
 import mongoose from "mongoose";
-import connection from "../../config/db.js"; 
+import connection from "../../config/db.js";
 
 const { Schema } = mongoose;
-
 
 mongoose.connection = connection;
 
 const userSchema = new Schema(
   {
-
-
     name: { type: String },
     email: {
       type: String,
       required: true,
       unique: true,
-      match: [
-        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-        "Invalid email",
-      ],
+      match: [/^[\w.-]+@[\w.-]+\.[A-Za-z]{2,}$/, "Invalid email"],
     },
+
     password: {
       type: String,
       required: function () {
@@ -40,6 +35,9 @@ const userSchema = new Schema(
       default: "local",
     },
     isVerified: { type: Boolean, default: false },
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
+
     passwordChangedAt: Date,
   },
   { timestamps: true }
