@@ -24,3 +24,8 @@ pydantic_core
 pydantic-settings 
 python-dotenv                            
 langchain-huggingface
+# GraphRAG dependencies
+graphrag
+networkx
+python-louvain
+graspologic
