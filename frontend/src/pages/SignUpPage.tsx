@@ -137,7 +137,7 @@ export default function SignUpPage() {
                 required
               />
               I agree to the{" "}
-              <a href="#" className="text-green-800 ml-1 hover:underline">
+              <a href="/terms" className="text-green-800 ml-1 hover:underline">
                 Terms & Conditions
               </a>
             </div>
