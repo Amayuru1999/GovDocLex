@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaArrowLeft, FaRegEyeSlash } from "react-icons/fa";
+import { FaArrowLeft, FaRegEyeSlash, FaRegEye } from "react-icons/fa";
 import { GoogleLogin } from "@react-oauth/google";
 import signup from "../assets/images/sign.jpg";
 import footerbackheight from "../assets/images/footerbackheight.png";
@@ -8,6 +9,10 @@ import { toast } from "react-toastify";
 
 export default function SignUpPage() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -75,7 +80,6 @@ export default function SignUpPage() {
             </a>
           </p>
 
-          {/* ✅ attach handleSubmit here */}
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <label className="block text-gray-700 mb-1">Name</label>
@@ -104,13 +108,24 @@ export default function SignUpPage() {
               <label className="block text-gray-700 mb-1">Password</label>
               <div className="relative">
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   placeholder="Enter your password"
-                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-800"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-800 pr-10"
                   required
                 />
-                <FaRegEyeSlash className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <span
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-green-800 cursor-pointer"
+                >
+                  {showPassword ? (
+                    <FaRegEye className="w-5 h-5" />
+                  ) : (
+                    <FaRegEyeSlash className="w-5 h-5" />
+                  )}
+                </span>
               </div>
             </div>
 
@@ -120,13 +135,24 @@ export default function SignUpPage() {
               </label>
               <div className="relative">
                 <input
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   name="confirmPassword"
                   placeholder="Confirm password"
-                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-800"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-800 pr-10"
                   required
                 />
-                <FaRegEyeSlash className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <span
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-green-800 cursor-pointer"
+                >
+                  {showConfirmPassword ? (
+                    <FaRegEye className="w-5 h-5" />
+                  ) : (
+                    <FaRegEyeSlash className="w-5 h-5" />
+                  )}
+                </span>
               </div>
             </div>
 
