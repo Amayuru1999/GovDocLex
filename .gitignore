@@ -3,3 +3,4 @@ rag/.venv/
 
 .env
 .idea
+.DS_Store
