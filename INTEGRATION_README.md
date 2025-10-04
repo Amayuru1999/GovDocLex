@@ -25,7 +25,7 @@ chmod +x start-services.sh
 
 #### 1. Start Python RAG API
 ```bash
-cd Fyp-Rag
+cd rag
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
@@ -165,7 +165,7 @@ npm run preview     # Preview production build
 
 ### Python API Development
 ```bash
-cd Fyp-Rag
+cd rag
 source venv/bin/activate
 python rag_api.py   # Start API server
 ```
@@ -206,7 +206,7 @@ tail -f logs/app.log
 ### Python API Logs
 ```bash
 # View Python API logs
-cd Fyp-Rag
+cd rag
 python rag_api.py  # Logs will appear in console
 ```
 
@@ -224,7 +224,7 @@ lsof -ti:5173 | xargs kill -9  # React frontend
 
 #### 2. Python Dependencies Issues
 ```bash
-cd Fyp-Rag
+cd rag
 rm -rf venv
 python3 -m venv venv
 source venv/bin/activate
