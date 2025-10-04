@@ -1,4 +1,5 @@
-Fyp-Rag/.venv/
+rag/.venv/
 **/node_modules/
 
 .env
+.idea
