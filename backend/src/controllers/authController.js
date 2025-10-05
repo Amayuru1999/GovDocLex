@@ -34,7 +34,7 @@ const localSignInController = async (req, res) => {
       token,
     });
   } catch (error) {
-    res.status(400).json({ status: false, message: error.message });
+    res.status(400).json({ status: false });
   }
 };
 
