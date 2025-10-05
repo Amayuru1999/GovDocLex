@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaArrowLeft, FaRegEyeSlash, FaRegEye } from "react-icons/fa";
 import { GoogleLogin } from "@react-oauth/google";
-import signup from "../assets/images/sign.jpg";
+import signup from "../assets/images/flag.png";
 import footerbackheight from "../assets/images/footerbackheight.png";
 import { toast } from "react-toastify";
 
