@@ -1,20 +1,61 @@
-import CommonLabel from "@/components/common/Label";
+// import CommonLabel from "@/components/common/Label";
+// import greenball from "/assets/images/green_ball.png";
+
+// function About() {
+//   return (
+//     <div className="py-4 xsm:p-6 sm:p-12 md:p-20 xl:p-24 relative max-w-[1920px] mx-auto">
+//       <img
+//         src={greenball}
+//         alt="greenball"
+//         className="hidden sm:block absolute z-0 bottom-20 xl:bottom-0 left-1/4 w-[400px] lg:w-[600px] xl:w-[800px]"
+//       />
+//       <div className="p-4 sm:p-6 md:p-10 xl:p-12  bg-[#0E2324]/20 rounded-3xl text-center flex flex-col items-center gap-2 sm:gap-4">
+//         <CommonLabel text={"What is GovDocLex"} />
+//         <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFFFFF] to-[#FFFFFF]/50 font-sfpro text-4xl md:text-6xl">
+//           Built for Innovators, Loved by Everyone
+//         </h1>
+//         <p className="text-white/80 font-sfpro text-sm lg:text-xl">
+//           GovDocLex is an AI-powered platform designed to extract, analyze, and
+//           explain complex information from Sri Lankan government documents—such
+//           as Gazettes, Acts, Bills, and Circulars—transforming them into
+//           structured, interconnected knowledge.
+//         </p>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default About;
+
+// import CommonLabel from "@/components/common/Label";
 import greenball from "/assets/images/green_ball.png";
 
 function About() {
   return (
-    <div className="py-4 xsm:p-6 sm:p-12 md:p-20 xl:p-24 relative max-w-[1920px] mx-auto">
+    <div className="py-4 xsm:p-6 sm:p-12 md:p-20 xl:p-24 relative max-w-[1920px] mx-auto mt-10 md:mt-0">
+      {/* Green ball background accent */}
       <img
         src={greenball}
         alt="greenball"
-        className="hidden sm:block absolute z-0 bottom-20 xl:bottom-0 left-1/4 w-[400px] lg:w-[600px] xl:w-[800px]"
+        className="hidden sm:block absolute z-0 bottom-20 xl:bottom-0 left-1/4 w-[400px] lg:w-[600px] xl:w-[800px] opacity-20"
       />
-      <div className="p-4 sm:p-6 md:p-10 xl:p-12 border bg-[#0E2324]/20 rounded-3xl text-center flex flex-col items-center gap-2 sm:gap-4">
-        <CommonLabel text={"What is GovDocLex"} />
-        <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFFFFF] to-[#FFFFFF]/50 font-sfpro text-xl sm:text-2xl md:text-3xl lg:text-4xl">
+
+      {/* Dark themed container */}
+      <div className="relative z-10 p-6 sm:p-8 md:p-12 xl:p-16
+                      bg-[#0E2324]/20 backdrop-blur-md border border-white/10 
+                      rounded-3xl text-center flex flex-col items-center gap-4
+                      shadow-[0_8px_30px_rgba(0,0,0,0.3)]">
+        {/* Label */}
+        {/* <CommonLabel text={"What is GovDocLex"} /> */}
+
+        {/* Heading */}
+        <h1 className="text-transparent bg-clip-text bg-gradient-to-r 
+                       from-white to-white/70 font-sfpro text-4xl md:text-6xl">
           Built for Innovators, Loved by Everyone
         </h1>
-        <p className="text-white/80 font-sfpro text-xs sm:text-sm md:text-base">
+
+        {/* Description */}
+        <p className="text-white/80 font-sfpro text-sm lg:text-xl max-w-3xl">
           GovDocLex is an AI-powered platform designed to extract, analyze, and
           explain complex information from Sri Lankan government documents—such
           as Gazettes, Acts, Bills, and Circulars—transforming them into
@@ -26,3 +67,4 @@ function About() {
 }
 
 export default About;
+

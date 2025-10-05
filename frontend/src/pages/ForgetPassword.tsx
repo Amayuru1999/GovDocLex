@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaArrowLeft } from "react-icons/fa";
-import forget from "../assets/images/forget.jpg"; // change image if you want
+import forget from "../assets/images/sign.jpg"; 
 import footerbackheight from "../assets/images/footerbackheight.png";
 import { toast } from "react-toastify";
 
