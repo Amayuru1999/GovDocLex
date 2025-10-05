@@ -1,3 +1,4 @@
+
 import React from "react";
 
 interface KeyFeaturesCardProps {
@@ -12,17 +13,21 @@ const KeyFeaturesCard: React.FC<KeyFeaturesCardProps> = ({
   icon,
 }) => {
   return (
-    <div className="bg-[#101820]  rounded-xl p-4 shadow-md text-white w-full mx-auto py-10 min-h-52 items-start flex flex-col justify-center">
-      <div className="flex items-center mb-2 space-x-2">
+    <div className="relative w-full mx-auto p-6 min-h-52 rounded-2xl flex flex-col justify-center items-start border border-white/20
+      bg-[#0E2324]/20 backdrop-blur-md  shadow-[0_4px_30px_rgba(0,0,0,0.1)] 
+      hover:shadow-[0_0_25px_rgba(9,204,244,0.4)] transition-all duration-300 ease-in-out">
+      
+      <div className="flex items-center mb-3 space-x-3">
         {icon &&
           (typeof icon === "string" ? (
-            <img src={icon} alt="icon" className="w-6 h-6" />
+            <img src={icon} alt="icon" className="w-8 h-8" />
           ) : (
-            <span className="text-white text-lg">{icon}</span>
+            <span className="text-light-blue text-2xl">{icon}</span>
           ))}
-        <h3 className="text-2xl font-semibold">{title}</h3>
+        <h3 className="text-2xl font-semibold text-white drop-shadow-sm">{title}</h3>
       </div>
-      <p className="text-lg text-gray-400">{description}</p>
+
+      <p className="text-lg text-gray-300">{description}</p>
     </div>
   );
 };

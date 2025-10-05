@@ -2,7 +2,7 @@ import { useState, FormEvent } from "react";
 import axios from "axios";
 import { FaRegEyeSlash, FaArrowLeft, FaRegEye } from "react-icons/fa";
 import { GoogleLogin } from "@react-oauth/google";
-import signin from "../assets/images/sign.jpg";
+import signin from "../assets/images/Govlogo.png";
 import footerbackheight from "../assets/images/footerbackheight.png";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";

@@ -1,6 +1,6 @@
 // src/components/GovDocLexFeatures.jsx
 
-import extractimg from "../assets/images/smartextraction.png"; 
+import extractimg from "../assets/images/smartextraction.png";
 
 const features = [
   {
@@ -17,8 +17,7 @@ const features = [
     icon: (
       <span className="inline-block w-6 h-6 bg-gradient-to-tr from-green-400 to-blue-500 rounded-full mr-2" />
     ),
-    bg: "bg-[#0f181f]",
-    border: "border-green-400",
+    glow: "shadow-[0_0_25px_rgba(34,197,94,0.4)]",
   },
   {
     title: "Contextual Reasoning",
@@ -26,8 +25,7 @@ const features = [
     icon: (
       <span className="inline-block w-6 h-6 bg-gradient-to-tr from-cyan-400 to-blue-400 rounded-full mr-2" />
     ),
-    bg: "bg-[#101820]",
-    border: "border-cyan-400",
+    glow: "shadow-[0_0_25px_rgba(34,211,238,0.4)]",
   },
   {
     title: "Interactive Exploration",
@@ -41,47 +39,54 @@ const features = [
     icon: (
       <span className="inline-block w-6 h-6 bg-gradient-to-tr from-blue-400 to-purple-400 rounded-full mr-2" />
     ),
-    bg: "bg-[#101820]",
-    border: "border-blue-400",
+    glow: "shadow-[0_0_25px_rgba(96,165,250,0.4)]",
   },
 ];
+
 const feature = features[0];
 
 export default function GovDocLexFeatures() {
   return (
-    <div className="bg-[#0b1016]  flex flex-col justify-center items-center px-5">
-      {" "}
-      <div className="  text-white font-sans px-4 py-10 grid grid-cols-1 md:grid-cols-[30%_70%] mx-auto  items-center max-w-[1920px] gap-5 ">
-        {/* Feature Cards */}
-        <div className=" w-full">
+    <div className="bg-[#0b1016] flex flex-col justify-center items-center px-5">
+      <div className="text-white font-sans px-4 py-10 grid grid-cols-1 md:grid-cols-[30%_70%] mx-auto items-center max-w-[1920px] gap-5">
+        
+        {/* Left Side Main Feature Card */}
+        <div className="w-full">
           {feature && (
             <div
               key={feature.title}
-              className={`flex-1 rounded-2xl shadow-lg p-6  ${feature.border} ${feature.bg} h-full`}
+              className={`flex-1 rounded-2xl p-6 h-full 
+                bg-[#0E2324]/20  backdrop-blur-md 
+                ${feature.glow} hover:shadow-[0_0_40px_rgba(9,204,244,0.5)]
+                transition-all duration-300 ease-in-out`}
             >
               <div className="flex items-center mb-3">
                 {feature.icon}
                 <span className="font-semibold text-2xl">{feature.title}</span>
               </div>
               <div className="text-gray-300 text-lg">{feature.description}</div>
-              <div className="flex justify-center  mt-4 ">
-                    <img
-                        src={extractimg}
-                        alt="Feature Illustration"
-                        className="rounded-2xl w-full "
-                    />
-                </div>
+              <div className="flex justify-center mt-4">
+                <img
+                  src={extractimg}
+                  alt="Feature Illustration"
+                  className="rounded-2xl w-full shadow-lg"
+                />
+              </div>
             </div>
-            
           )}
         </div>
 
-        <div className=" h-full">
-          <div className="flex flex-col md:flex-row gap-6 mb-10  w-full">
+        {/* Right Side Content */}
+        <div className="h-full">
+          {/* Two Feature Cards */}
+          <div className="flex flex-col md:flex-row gap-6 mb-10 w-full">
             {features.slice(1).map((f) => (
               <div
                 key={f.title}
-                className={`flex-1 rounded-2xl shadow-lg p-6 border-l-4 ${f.border} ${f.bg} `}
+                className={`flex-1 rounded-2xl p-6 
+                  bg-[#0E2324]/20  backdrop-blur-md ${f.glow} 
+                  hover:shadow-[0_0_40px_rgba(9,204,244,0.5)]
+                  transition-all duration-300 ease-in-out`}
               >
                 <div className="flex items-center mb-3">
                   {f.icon}
@@ -91,7 +96,8 @@ export default function GovDocLexFeatures() {
               </div>
             ))}
           </div>
-          {/* Main Title */}
+
+          {/* Main Title Section */}
           <div className="mb-4">
             <span className="inline-block bg-gradient-to-r from-cyan-500 to-blue-500 text-lg px-3 py-1 rounded-full mb-2">
               Our Features
@@ -102,8 +108,11 @@ export default function GovDocLexFeatures() {
             </h2>
           </div>
 
-          {/* Bullet Points */}
-          <div className="bg-[#101820] rounded-xl shadow-lg p-6  w-full text-lg">
+          {/* Bullet Points Section */}
+          <div
+            className="bg-[#0E2324]/20 backdrop-blur-md  border border-white/20 
+            rounded-2xl shadow-[0_0_25px_rgba(9,204,244,0.2)] p-6 w-full text-lg transition-all duration-300 hover:shadow-[0_0_40px_rgba(9,204,244,0.4)]"
+          >
             <ul className="list-disc list-inside space-y-2 text-gray-200">
               <li>
                 <span className="font-bold text-cyan-400">
@@ -116,9 +125,7 @@ export default function GovDocLexFeatures() {
                 Audit regulatory compliance by mapping circulars to parent Acts.
               </li>
               <li>
-                <span className="font-bold text-cyan-400">
-                  For Researchers:
-                </span>{" "}
+                <span className="font-bold text-cyan-400">For Researchers:</span>{" "}
                 Discover hidden relationships between policies with AI-assisted
                 analysis.
               </li>
