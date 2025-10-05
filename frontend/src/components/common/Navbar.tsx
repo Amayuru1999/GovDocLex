@@ -75,7 +75,7 @@ function Navbar() {
           {navItems.map((item) => (
             <ul
               key={item.id}
-              className={`text-sm lg:text-lg px-6 xl:px-10 py-2 cursor-pointer font-sfpro 
+              className={`text-sm lg:text-lg px-6 xl:px-10 py-2 cursor-pointer 
                   ${
                     activeNavItem === item.id
                       ? "border-white text-[#41B7FC]"
