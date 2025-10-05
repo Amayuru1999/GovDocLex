@@ -17,22 +17,22 @@ export const teamData: TeamMember[] = [
   },
   {
       name: "Nisal De Zoysa",
-      description: "AI Engineer",
+      description: "AI & Software Engineer",
       profileImage: "/assets/images/nisal.jpg"
   },
   {
       name: "Amayuru Amarasinghe",
-      description: "AI Engineer",
+      description: "AI & Software Engineer",
       profileImage: "../assets/images/amauru.png"
   },
   {
       name: "Hiruna De Silva",
-      description: "Full-Stack Developer",
+      description: "AI & Software Engineer",
       profileImage: "/assets/images/hiruna.jpg"
   },
   {
       name: "Kavindu Dilshan",
-      description: "Full-Stack Developer",
+      description: "AI & Software Engineer",
       profileImage: "/assets/images/kavindur.jpg"
   },
 ];
