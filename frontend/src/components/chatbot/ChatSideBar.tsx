@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { chatService, type ChatSession } from "../../services/chatService";
+import ConfirmationModal from "../common/ConfirmationModal";
 
 type SidebarProps = {
   sidebarOpen: boolean;
@@ -25,6 +26,7 @@ export default function Sidebar({
   const [previousSessions, setPreviousSessions] = useState<ChatSession[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
   const navigate = useNavigate();
 
   // Load chat sessions when component mounts or sidebar opens
@@ -140,9 +142,18 @@ export default function Sidebar({
   };
 
   const handleSignOut = () => {
+    setShowSignOutModal(true);
+  };
+
+  const confirmSignOut = () => {
     localStorage.removeItem("token");
     toast.success("Signed out successfully!");
     navigate("/signin");
+    setShowSignOutModal(false);
+  };
+
+  const cancelSignOut = () => {
+    setShowSignOutModal(false);
   };
 
   return (
@@ -356,6 +367,17 @@ export default function Sidebar({
           </div>
         )}
       </div>
+
+      {/* Sign Out Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showSignOutModal}
+        title="Sign Out Confirmation"
+        message="Are you sure you want to sign out?"
+        confirmText="Sign Out"
+        cancelText="Cancel"
+        onConfirm={confirmSignOut}
+        onCancel={cancelSignOut}
+      />
     </div>
   );
 }
