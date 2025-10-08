@@ -74,9 +74,9 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
       />
       
       {/* Modal */}
-      <div className="relative w-full max-w-2xl mx-4 bg-[#0D1520] border border-[#34495E]/40 rounded-xl shadow-2xl max-h-[90vh] overflow-hidden">
+      <div className="relative w-full max-w-2xl mx-4 bg-[#0D1520] border border-[#34495E]/40 rounded-xl shadow-2xl max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-[#34495E]/40">
+        <div className="flex items-center justify-between p-6 border-b border-[#34495E]/40 flex-shrink-0">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-[#2EF2B8]/10 rounded-lg">
               <FileText className="w-6 h-6 text-[#2EF2B8]" />
@@ -99,8 +99,8 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
           </Button>
         </div>
 
-        {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        {/* Content - Scrollable */}
+        <div className="p-6 overflow-y-auto flex-1 min-h-0">
           {/* Upload Status Message */}
           {uploadMessage && (
             <div className={`mb-4 p-4 rounded-lg border ${
@@ -143,8 +143,8 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
           </div> */}
         </div>
 
-        {/* Footer */}
-        <div className="flex justify-end space-x-3 p-6 border-t border-[#34495E]/40">
+        {/* Footer - Always visible */}
+        <div className="flex justify-end space-x-3 p-6 border-t border-[#34495E]/40 flex-shrink-0">
           <Button
             variant="ghost"
             onClick={handleClose}
