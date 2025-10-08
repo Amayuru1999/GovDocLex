@@ -2,26 +2,51 @@ import React from "react";
 import footerback from "../../assets/images/footerback.png";
 
 const FooterSection: React.FC = () => {
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
   return (
     <footer className="bg-[#0a1117] text-white py-16 px-4  relative">
       <div className="max-w-[1920px] mx-auto flex flex-col md:justify-center">
         <div className="flex-1 flex justify-center">
           <div className="text-sm lg:text-lg flex gap-6 sm:gap-10 lg:gap-20 w-full justify-center sm:pb-4 lg:pb-6 z-50">
-            <a href="#home" className="hover:underline cursor-pointer">
+            <button 
+              onClick={() => scrollToSection('home')} 
+              className="hover:underline cursor-pointer"
+            >
               Home
-            </a>
-            <a href="#about" className="hover:underline">
+            </button>
+            <button 
+              onClick={() => scrollToSection('about')} 
+              className="hover:underline cursor-pointer"
+            >
               About
-            </a>
-            <a href="#features" className="hover:underline">
+            </button>
+            <button 
+              onClick={() => scrollToSection('features')} 
+              className="hover:underline cursor-pointer"
+            >
               Features
-            </a>
-            <a href="#explore" className="hover:underline">
+            </button>
+            <button 
+              onClick={() => scrollToSection('explore')} 
+              className="hover:underline cursor-pointer"
+            >
               Explore
-            </a>
-            <a href="#team" className="hover:underline">
+            </button>
+            <button 
+              onClick={() => scrollToSection('team')} 
+              className="hover:underline cursor-pointer"
+            >
               Team
-            </a>
+            </button>
           </div>
         </div>
 

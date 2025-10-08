@@ -7,6 +7,7 @@ import { Card, CardContent } from "../ui/Card";
 import axios from "axios";
 import { FormEvent } from "react";
 import { chatService } from "../../services/chatService";
+import { DocumentUploadModal } from "./DocumentUploadModal";
 
 interface ChatEntry {
   user: string;
@@ -30,24 +31,34 @@ interface MainChatProps {
 function MainChat({ sessionId: propSessionId, onSessionChange }: MainChatProps) {
   const quickActions = [
     {
+      label: "Upload Documents",
+      sub: "Add your own documents",
+      action: () => setIsUploadModalOpen(true),
+    },
+    {
       label: "Government structure",
       sub: "Explore Government hierarchy",
+      action: () => setMessage("Tell me about the Sri Lankan government structure"),
     },
     {
       label: "Smart Search",
       sub: "Find notes instantly",
+      action: () => setMessage("How can I search for specific laws and acts?"),
     },
     {
       label: "Organized Categories",
       sub: "Navigate by folder",
+      action: () => setMessage("Show me the different categories of Sri Lankan laws"),
     },
     {
       label: "Trending Notes",
       sub: "See popular materials",
+      action: () => setMessage("What are the most commonly referenced acts in Sri Lanka?"),
     },
     {
       label: "Save & Bookmark",
       sub: "Quick access later",
+      action: () => setMessage("How can I save and bookmark important legal information?"),
     },
   ];
 
@@ -56,6 +67,7 @@ function MainChat({ sessionId: propSessionId, onSessionChange }: MainChatProps) 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [user, setUser] = useState<User | null>(null);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   // Use prop sessionId instead of internal state
   const currentSessionId = propSessionId;
@@ -227,7 +239,12 @@ function MainChat({ sessionId: propSessionId, onSessionChange }: MainChatProps) 
             disabled={isLoading}
           />
           <div className="flex items-center gap-2">
-            <Paperclip className="cursor-pointer opacity-70 hover:opacity-100 w-4 sm:w-5" />
+            <div title="Upload documents">
+              <Paperclip 
+                className="cursor-pointer opacity-70 hover:opacity-100 w-4 sm:w-5" 
+                onClick={() => setIsUploadModalOpen(true)}
+              />
+            </div>
             <Mic className="cursor-pointer opacity-70 hover:opacity-100 w-4 sm:w-5" />
             <Button
               type="submit"
@@ -250,7 +267,8 @@ function MainChat({ sessionId: propSessionId, onSessionChange }: MainChatProps) 
         {quickActions.map((qa) => (
           <Card
             key={qa.label}
-            className="bg-[#0D1520]/80 border-[#34495E]/40 text-left hover:ring-1 hover:ring-[#2EF2B8]/50 transition-all"
+            className="bg-[#0D1520]/80 border-[#34495E]/40 text-left hover:ring-1 hover:ring-[#2EF2B8]/50 transition-all cursor-pointer"
+            onClick={qa.action}
           >
             <CardContent className="p-2 md:p-4">
               <h3 className="text-xs lg:text-sm font-semibold md:mb-1">
@@ -261,6 +279,16 @@ function MainChat({ sessionId: propSessionId, onSessionChange }: MainChatProps) 
           </Card>
         ))}
       </div>
+
+      {/* Document Upload Modal */}
+      <DocumentUploadModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        onUploadSuccess={() => {
+          // Optional: Add any success handling here
+          console.log('Documents uploaded successfully');
+        }}
+      />
     </div>
   );
 }
