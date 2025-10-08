@@ -49,7 +49,13 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       if (type.startsWith('.')) {
         return fileExtension === type;
       }
-      return mimeType.includes(type.replace('*', ''));
+      // Handle MIME type patterns with wildcards
+      if (type.includes('*')) {
+        const pattern = type.replace(/\*/g, '.*');
+        const regex = new RegExp(`^${pattern}$`);
+        return regex.test(mimeType);
+      }
+      return mimeType === type;
     });
 
     if (!isValidType) {
