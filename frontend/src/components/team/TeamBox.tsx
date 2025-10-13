@@ -1,6 +1,6 @@
 import { teamData } from "@/constants/teamData.constants";
 import TeamCard from "./TeamCard";
-import box from "/assets/images/blue_box.webp";
+import box from "/assets/images/team/blue_box.webp";
 
 const cardPositions = [
   { top: "0%", left: "-30%" },

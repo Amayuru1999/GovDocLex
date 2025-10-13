@@ -22,3 +22,11 @@ html {
   font-style: normal;
   font-display: swap;
 }
+
+@font-face {
+  font-family: "midsun";
+  src: url("/public/assets/fonts/MidMidSunSun.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}

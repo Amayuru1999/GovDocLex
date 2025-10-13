@@ -13,7 +13,7 @@ const CommonLabel = ({ text }: CommonLabelProps) => {
   );
 };
 
-export const BookTableBtn = () => (
+export const StartedBtn = () => (
   <CommonLabel text="Get Started" />
 );
 
