@@ -22,6 +22,7 @@ module.exports = {
         popins: ["popins", "sans-serif"],
         roboto: ["roboto", "sans-serif"],
         midsun: ["midsun", "sans-serif"],
+        gilroy: ["gilroy", "sans-serif"]
       },
       screens: {
         "xsm": "500px",

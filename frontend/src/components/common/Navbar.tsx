@@ -68,7 +68,7 @@ function Navbar() {
           <img
             src={Logo}
             alt="logo"
-            className="cursor-pointer w-14 xl:w-1/3"
+            className="cursor-pointer w-14 xl:w-1/3 hover:animate-rotate-y"
             onClick={handleLogoClick}
           />
         </div>

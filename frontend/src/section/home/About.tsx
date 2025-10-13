@@ -1,4 +1,3 @@
-
 import greenball from "/assets/images/background/green_ball.png";
 
 function About() {
@@ -12,16 +11,21 @@ function About() {
       />
 
       {/* Dark themed container */}
-      <div className="relative z-10 p-6 sm:p-8 md:p-12 xl:p-16
-                      bg-[#0E2324]/20 backdrop-blur-md border border-white/10 
+      <div
+        className="relative z-10 p-6 sm:p-8 md:p-12 xl:p-16
+                      bg-[#0E2324]/20 backdrop-blur-md border border-white/20 
                       rounded-3xl text-center flex flex-col items-center gap-4
-                      shadow-[0_8px_30px_rgba(0,0,0,0.3)]">
+                      shadow-[0_4px_30px_rgba(0,0,0,0.1)] hover:shadow-[0_0_25px_rgba(9,204,244,0.4)] transition-all duration-300 ease-in-out"
+        data-aos="zoom-in"
+      >
         {/* Label */}
         {/* <CommonLabel text={"What is GovDocLex"} /> */}
 
         {/* Heading */}
-        <h1 className="text-transparent bg-clip-text bg-gradient-to-r 
-                       from-white to-white/70 font-sfpro text-4xl md:text-6xl">
+        <h1
+          className="text-transparent bg-clip-text bg-gradient-to-r 
+                       from-white to-white/70 font-sfpro text-4xl md:text-6xl"
+        >
           Built for Innovators, Loved by Everyone
         </h1>
 
@@ -38,4 +42,3 @@ function About() {
 }
 
 export default About;
-
