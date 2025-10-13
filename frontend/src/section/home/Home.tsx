@@ -22,7 +22,7 @@ function Hero() {
   return (
     <div>
       <div>
-        <img src={Banner} alt="Banner" className="w-full h-[400px] border" data-aos="zoom-in" />
+        <img src={Banner} alt="Banner" className="w-full h-[400px] rounded-3xl border" data-aos="zoom-in" />
       </div>
       <div className="flex max-w-[1920px] mx-auto mt-10 md:mt-0">
         <div className="flex flex-col justify-center gap-3 lg:gap-4 lg:w-3/4">
