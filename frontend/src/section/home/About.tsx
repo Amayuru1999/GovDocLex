@@ -1,5 +1,5 @@
 
-import greenball from "/assets/images/green_ball.png";
+import greenball from "/assets/images/background/green_ball.png";
 
 function About() {
   return (

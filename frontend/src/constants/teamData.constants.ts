@@ -8,31 +8,31 @@ export const teamData: TeamMember[] = [
   {
       name: "Dr. Kushan Sudheera",
       description: "Supervisor",
-      profileImage: "/assets/images/kushansir.jpg"
+      profileImage: "/assets/images/team/kushansir.jpg"
   },
   {
       name: "Dr. Vibhatha Abeykon",
       description: "Co-Supervisor",
-      profileImage: "/assets/images/vibathasir.jpg"
+      profileImage: "/assets/images/team/vibathasir.jpg"
   },
   {
       name: "Nisal De Zoysa",
       description: "AI & Software Engineer",
-      profileImage: "/assets/images/nisal.jpg"
+      profileImage: "/assets/images/team/nisal.jpg"
   },
   {
       name: "Amayuru Amarasinghe",
       description: "AI & Software Engineer",
-      profileImage: "../assets/images/amauru.png"
+      profileImage: "../assets/images/team/amauru.png"
   },
   {
       name: "Hiruna De Silva",
       description: "AI & Software Engineer",
-      profileImage: "/assets/images/hiruna.jpg"
+      profileImage: "/assets/images/team/hiruna.jpg"
   },
   {
       name: "Kavindu Dilshan",
       description: "AI & Software Engineer",
-      profileImage: "/assets/images/kavindur.jpg"
+      profileImage: "/assets/images/team/kavindur.jpg"
   },
 ];

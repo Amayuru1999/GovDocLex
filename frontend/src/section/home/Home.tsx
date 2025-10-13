@@ -15,8 +15,8 @@ function Hero() {
 
   return (
     <div>
-      <div className="border">
-        <img src={Banner} alt="Banner" className="w-full h-[450px] border" />
+      <div className="">
+        <img src={Banner} alt="Banner" className="w-full h-[400px] border" />
       </div>
       <div className="flex max-w-[1920px] mx-auto mt-10 md:mt-0">
         <div className="flex flex-col justify-center gap-3 lg:gap-4 lg:w-3/4">

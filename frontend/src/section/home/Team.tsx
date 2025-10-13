@@ -1,5 +1,5 @@
 import CommonLabel from "@/components/common/Label";
-import greenball from "/assets/images/green_ball.png";
+import greenball from "/assets/images/background/green_ball.png";
 import TeamBox from "@/components/team/TeamBox";
 import { TryNowBtn } from "@/components/common/Button";
 
