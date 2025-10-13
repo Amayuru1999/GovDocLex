@@ -1,6 +1,6 @@
 // src/models/User.js
 import mongoose from "mongoose";
-import connection from "../../config/db.js";
+import connection from "../config/db.js";
 
 const { Schema } = mongoose;
 
