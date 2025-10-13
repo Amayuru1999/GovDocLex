@@ -24,8 +24,8 @@ import { requestLogger } from './middleware/requestLogger.js';
 import { initializeRAGService } from './services/ragService.js';
 import { initializeWebSocket } from './services/websocketService.js';
 
-import { connectDB } from "../config/db.js";
-import { config } from "../config/config.js";
+import { connectDB } from "./config/db.js";
+import { config } from "./config/config.js";
 import router from './routes/index.js';
 
 
