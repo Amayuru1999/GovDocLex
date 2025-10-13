@@ -30,3 +30,11 @@ html {
   font-style: normal;
   font-display: swap;
 }
+
+@font-face {
+  font-family: "gilroy";
+  src: url("/public/assets/fonts/Gilroy-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
