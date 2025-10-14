@@ -27,8 +27,8 @@ function Team() {
       const ticks = Math.max(200, 500 * (timeLeft / duration));
       skew = Math.max(0.8, skew - 0.001);
 
-      // Add a low probability for confetti to appear (sparse effect)
-      if (Math.random() < 0.2) { // 10% chance per frame
+      
+      if (Math.random() < 0.2) { 
         confetti({
           particleCount: 1,
           startVelocity: 0,
@@ -55,9 +55,9 @@ function Team() {
 
   useEffect(() => {
     AOS.init({
-      duration: 1000, // default animation duration (ms)
+      duration: 1000, 
       easing: 'ease-out-cubic',
-      once: true, // whether animation should happen only once
+      once: true, 
     });
   }, []);
 
@@ -66,12 +66,12 @@ function Team() {
       ref={rootRef}
       className="py-4 xsm:p-6 sm:p-12 md:p-20 xl:p-24 relative max-w-[1920px] mx-auto bg-[radial-gradient(circle,#1f2937_1px,transparent_1px)] [background-size:20px_20px] bg-[#0b0f14]"
     >
-      {/* Section Label */}
+      
       <div data-aos="fade-down" className="flex justify-center">
         <CommonLabel text="Team" />
       </div>
 
-      {/* Floating Green Ball */}
+
       <img
         src={greenball}
         alt="greenball"
@@ -80,7 +80,7 @@ function Team() {
         data-aos-delay="200"
       />
 
-      {/* Intro Card */}
+      
       <div
         className="p-4 sm:p-6 bg-[#0E2324]/20 rounded-3xl text-center flex flex-col items-center gap-2 relative z-[1] backdrop-blur-[2px]"
         data-aos="fade-up"
@@ -94,12 +94,12 @@ function Team() {
         </p>
       </div>
 
-      {/* Team Grid */}
+      
       <div className="flex justify-center relative z-[1]" data-aos="fade-up" data-aos-delay="400">
         <TeamBox />
       </div>
 
-      {/* CTA Button */}
+      
       <div className="justify-center flex relative z-[1]" data-aos="zoom-in" data-aos-delay="500">
         <TryNowBtn />
       </div>
