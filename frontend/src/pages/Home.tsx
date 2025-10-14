@@ -10,8 +10,10 @@ import Chatbotbox from "@/components/chatbotbox";
 const Home = () => {
   return (
     <div className=" relative">
-      <Hero />
-
+      <section id="home">
+        <Hero />
+      </section>
+      
       <section id="about">
         <About />
       </section>
