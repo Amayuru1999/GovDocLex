@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import gsap from "gsap";
-import CommonLabel from "@/components/common/Label";
 import Court from "../../assets/images/rotatingimg.png";
 
 function Hero() {

@@ -11,7 +11,7 @@ const Home = () => {
   return (
     <div className=" relative">
       <Hero />
-      
+
       <section id="about">
         <About />
       </section>
@@ -24,7 +24,6 @@ const Home = () => {
 
       <section id="explore">
         <TrackEverything />
-     
       </section>
 
       <section id="team" className="hidden md:block">
@@ -32,15 +31,8 @@ const Home = () => {
       </section>
 
       <div className="absolute">
-
-        <Chatbotbox/>
-
-
-
-
+        <Chatbotbox />
       </div>
-
-
     </div>
   );
 };
