@@ -1,7 +1,0 @@
-rag/.venv/
-Fyp-Rag/.venv/
-**/node_modules/
-
-.env
-.idea
-.DS_Store
