@@ -1,56 +1,104 @@
+// src/components/FeatureHighlightSection.tsx
+import { useEffect } from "react";
 import { FaCheckCircle } from "react-icons/fa";
-import whytheseimg from "../assets/images/whytheses.png";
+import whytheseimg from "../assets/images/search.gif";
 import squareback from "../assets/images/squareback.png";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const FeatureHighlightSection = () => {
+  useEffect(() => {
+    AOS.init({
+      duration: 800, 
+      once: false,   
+      offset: 100,   
+      easing: "ease-out-cubic",
+    });
+  }, []);
+
   return (
-    <section className="bg-[#0B0F14] py-16 px-4 text-white flex flex-col justify-center items-center relative">
-      <div className=" mx-auto grid md:grid-cols-2 gap-10 items-center ">
-        {/* Left Content */}
-        <div className="space-y-6  ">
-          <button className="bg-[#1AD3FF1A] text-[#1AD3FF] text-lg font-medium px-4 py-1.5 rounded-full">
+    <section
+      className="bg-[radial-gradient(circle,_#1f2937_1px,_transparent_1px)]
+                 [background-size:20px_20px] bg-[#0b0f14]
+                 py-16 px-4 text-white flex flex-col justify-center items-center
+                 relative overflow-hidden"
+    >
+      
+      <img
+        src={squareback}
+        alt="squareback"
+        aria-hidden
+        className="hidden sm:block absolute z-0 w-[400px] lg:w-[600px] xl:w-[1800px]
+                   left-1/2 top-[72%] -translate-x-1/2 -translate-y-1/2
+                   pointer-events-none select-none opacity-60"
+      />
+
+      <div className="relative z-10 mx-auto grid md:grid-cols-2 gap-10 items-center">
+        {/* Left Column */}
+        <div
+          className="space-y-6"
+          data-aos="fade-right"
+          data-aos-delay="100"
+        >
+          <button
+            className="bg-[#1AD3FF1A] text-[#1AD3FF] text-lg font-medium
+                       px-4 py-1.5 rounded-full"
+            data-aos="zoom-in"
+            data-aos-delay="150"
+          >
             Why These Matter
           </button>
-          <h2 className="text-4xl md:text-6xl font-bold leading-tight">
+
+          <h2
+            className="text-4xl md:text-6xl font-bold leading-tight"
+            data-aos="fade-up"
+            data-aos-delay="200"
+          >
             Track Everything, Anytime,
             <br />
             Anywhere
           </h2>
+
           <ul className="space-y-3 text-[#B3B8C5] text-lg">
-            <li className="flex items-center gap-2">
-              <FaCheckCircle className="text-[#1AD3FF]" />
-              Faster legal research
-            </li>
-            <li className="flex items-center gap-2">
-              <FaCheckCircle className="text-[#1AD3FF]" />
-              Error-proof compliance tracking
-            </li>
-            <li className="flex items-center gap-2">
-              <FaCheckCircle className="text-[#1AD3FF]" />
-              Transparent decision-making with AI explanations
-            </li>
-            <li className="flex items-center gap-2">
-              <FaCheckCircle className="text-[#1AD3FF]" />
-              Future-ready system that scales with new document types
-            </li>
+            {[
+              "Faster legal research",
+              "Error-proof compliance tracking",
+              "Transparent decision-making with AI explanations",
+              "Future-ready system that scales with new document types",
+            ].map((txt, i) => (
+              <li
+                key={txt}
+                className="flex items-center gap-2"
+                data-aos="fade-left"
+                data-aos-delay={300 + i * 100}
+              >
+                <FaCheckCircle className="text-[#1AD3FF] shrink-0" />
+                {txt}
+              </li>
+            ))}
           </ul>
-          <button className="mt-6 bg-[#1AD3FF] hover:bg-[#0fcce6] text-[#0B0F14] font-bold px-6 py-2.5 rounded-full transition duration-300">
+
+          <button
+            className="mt-6 bg-[#1AD3FF] hover:bg-[#0fcce6] text-[#0B0F14]
+                       font-bold px-6 py-2.5 rounded-full transition duration-300"
+            data-aos="zoom-in"
+            data-aos-delay="700"
+          >
             Explore GovDocxLen
           </button>
         </div>
-        <img
-          src={squareback}
-          alt="squareback"
-          className="hidden sm:block absolute z-0 w-[400px] lg:w-[600px] xl:w-[1800px] 
-             left-1/2 top-[72%] transform -translate-x-1/2 -translate-y-1/2 "
-        />
 
-        {/* Right Image/Graphic */}
-        <div className="flex justify-center">
+        {/* Right Column */}
+        <div
+          className="flex justify-center"
+          data-aos="fade-left"
+          data-aos-delay="250"
+        >
           <img
             src={whytheseimg}
             alt="Feature Illustration"
-            className="rounded-2xl w-full "
+            className="rounded-2xl max-w-[300px] sm:w-full md:max-w-sm
+                       hover:scale-105 hover:rotate-1 transition-transform duration-500"
           />
         </div>
       </div>
