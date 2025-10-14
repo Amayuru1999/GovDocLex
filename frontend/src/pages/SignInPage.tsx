@@ -18,6 +18,24 @@ interface LoginResponse {
   };
 }
 
+interface GoogleAuthResponse {
+  token: string;
+  user: {
+    _id: string;
+    email: string;
+    authMethod: string;
+    isVerified: boolean;
+  };
+}
+
+interface AxiosError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
+
 export default function SignInPage() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -44,8 +62,11 @@ export default function SignInPage() {
       localStorage.setItem("userId", user._id);
 
       navigate("/chatbot");
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Login failed. Please try again.");
+    } catch (err: unknown) {
+      const errorMessage = err && typeof err === 'object' && 'response' in err 
+        ? (err as AxiosError).response?.data?.message || "Login failed. Please try again."
+        : "Login failed. Please try again.";
+      setError(errorMessage);
       toast.error("Invalid credentials");
     } finally {
       setLoading(false);
@@ -148,14 +169,15 @@ export default function SignInPage() {
           <GoogleLogin
             onSuccess={async (credentialResponse) => {
               try {
-                const response = await axios.post(
+                const response = await axios.post<GoogleAuthResponse>(
                   `${import.meta.env.VITE_SERVER_API}/google-auth`,
                   { credential: credentialResponse.credential }
                 );
                 localStorage.setItem("token", response.data.token);
                 localStorage.setItem("userId", response.data.user._id);
                 navigate("/chatbot");
-              } catch (err: any) {
+              } catch (err: unknown) {
+                console.error('Google login error:', err);
                 setError("Google login failed. Please try again.");
               }
             }}
