@@ -2,10 +2,10 @@
 module.exports = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
   ],
   prefix: "",
   theme: {
@@ -17,13 +17,22 @@ module.exports = {
       },
     },
     extend: {
+      colors: {
+        "light-blue": "#09CCF4",
+      },
+      boxShadow: {
+        custom3: "0 4px 30px rgba(9, 204, 244, 0.2)",
+      },
+
       fontFamily: {
         sfpro: ["sfpro", "sans-serif"],
         popins: ["popins", "sans-serif"],
         roboto: ["roboto", "sans-serif"],
+        midsun: ["midsun", "sans-serif"],
+        gilroy: ["gilroy", "sans-serif"]
       },
       screens: {
-        "xsm": "500px",
+        xsm: "500px",
       },
       colors: {
         border: "hsl(var(--border))",
@@ -66,6 +75,10 @@ module.exports = {
         sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
+        rotate: {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
         "accordion-down": {
           from: { height: "0" },
           to: { height: "var(--radix-accordion-content-height)" },
@@ -74,12 +87,17 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "spin-slow": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "spin-slow": "spin-slow 3s linear infinite",
       },
     },
   },
   plugins: [require("tailwindcss-animate")],
-}
+};
