@@ -21,7 +21,12 @@ export const localSignup = async (name: string, email: string, password: string)
 };
 
 export const localSignIn = async (email: string, password: string) => {
-  const user = await User.findOne({ email });
+
+  if (typeof email !== 'string') {
+    throw new Error('Invalid email format');
+  }
+  const user = await User.findOne({ email: { $eq: email } });
+  // const user = await User.findOne({ email });
   if (!user) throw new Error('User not found');
 
   if ((user as any).provider === 'google')
