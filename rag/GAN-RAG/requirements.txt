@@ -5,7 +5,7 @@ huggingface-hub
 python-dotenv 
 sentence-transformers
 torch
-langchain==0.0.350
+langchain==0.2.5
 langchain-community==0.0.15
 PyMuPDF
 chromadb
