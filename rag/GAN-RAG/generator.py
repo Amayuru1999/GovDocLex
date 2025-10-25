@@ -1,4 +1,7 @@
-from langchain_community.chat_models import ChatOpenAI
+try:
+    from langchain_openai import ChatOpenAI
+except ImportError:
+    from langchain_community.chat_models import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 import re
 from typing import List, Dict, Tuple
