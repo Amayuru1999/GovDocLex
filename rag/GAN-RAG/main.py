@@ -21,13 +21,15 @@ if __name__ == "__main__":
         for i, mq in enumerate(mini_qs, 1):
             print(f"{i}. {mq}")
 
-        print("\n=== Retrieving and generating sub-answers ===")
+        print("\n=== Enhanced Retrieval: Hybrid search + Re-ranking ===")
         sub_answers = {}
-        for q in mini_qs:
+        for i, q in enumerate(mini_qs, 1):
+            print(f"Processing question {i}/{len(mini_qs)}: {q[:60]}...")
             docs = retrieve_docs(q, collections)
             sub_answer = generate_sub_answer(q, docs)
             sub_answers[q] = sub_answer
-            print(f"Sub-answer for '{q}': {sub_answer[:100]}...")  # Truncated preview
+            print(f"Retrieved {len(docs)} documents, generated sub-answer ({len(sub_answer)} chars)")
+            print(f"Preview: {sub_answer[:100]}...")  # Truncated preview
 
         print("\n=== Discriminator: Synthesizing final answer ===")
         final_answer = synthesize_final_answer(user_question, mini_qs, sub_answers)
