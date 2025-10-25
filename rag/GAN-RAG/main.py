@@ -15,11 +15,11 @@ if __name__ == "__main__":
             print("Exiting GAN-RAG POC.")
             break
 
-        print("\n=== Generator: Creating mini-questions ===")
+        print("\n=== Enhanced Generator: Creating adaptive mini-questions ===")
         mini_qs = generate_mini_questions(user_question)
-        print("Mini-questions generated:")
-        for mq in mini_qs:
-            print(f"- {mq}")
+        print(f"Generated {len(mini_qs)} mini-questions based on complexity analysis:")
+        for i, mq in enumerate(mini_qs, 1):
+            print(f"{i}. {mq}")
 
         print("\n=== Retrieving and generating sub-answers ===")
         sub_answers = {}
