@@ -9,7 +9,7 @@ chromadb
 sentence-transformers==2.7.0
 python-dotenv
 torch
-transformers==4.40.2
+transformers==4.53.0
 PyMuPDF
 rank-bm25
 pymupdf
