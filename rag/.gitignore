@@ -3,6 +3,9 @@ legal_bert_embeddings.pkl
 openai_api_key.txt
 chromadb/
 chroma_storage/legal_db
+GAN-RAG/chroma_storage
+GAN-RAG/__pycache__/
+GAN-RAG/.env
 # Ignore Python cache files
 __pycache__/
 # Ignore environment variables

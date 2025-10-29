@@ -4,3 +4,4 @@ rag/.venv/
 .env
 .idea
 .DS_Store
+rag/GAN-RAG/chroma_storage
