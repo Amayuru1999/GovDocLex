@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 import re
 import math
 from typing import List, Dict, Tuple, Set
@@ -377,7 +375,6 @@ class EnhancedRetriever:
 # Global instance for enhanced retrieval
 _enhanced_retriever = EnhancedRetriever()
 
->>>>>>> Stashed changes
 def retrieve_docs(question, collections_dict, k=5):
     """Retrieve top-k relevant documents from all Chroma collections."""
     all_docs = []
