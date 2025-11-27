@@ -60,7 +60,7 @@ const Chatbot: React.FC = () => {
             {/* Chat content */}
             <div className="flex flex-col space-y-4">
               <div className="p-3  text-blue-800 ">
-                Hello! How can I assist you today?
+                Hello! How can I assist you today? 
               </div>
             </div>
           </div>
