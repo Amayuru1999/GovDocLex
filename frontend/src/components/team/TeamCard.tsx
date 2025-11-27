@@ -1,4 +1,4 @@
-import tag from "/assets/images/name_tag.webp";
+import tag from "/assets/images/team/name_tag.webp";
 
 interface TeamCardProps {
   name: string;

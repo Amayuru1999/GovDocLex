@@ -1,8 +1,8 @@
 import Footer from "@/components/common/Footer";
 import Navbar from "@/components/common/Navbar";
 import { Outlet } from "react-router-dom";
-import bgnav from "/assets/images/bg-nav.webp";
-import shinball from "/assets/images/shiny_buttons.webp";
+import bgnav from "/assets/images/background/bg-nav.webp";
+import shinball from "/assets/images/background/shiny_buttons.webp";
 
 const Layout = () => {
   return (

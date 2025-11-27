@@ -2,8 +2,9 @@ import { navItems } from "@/constants/navItems.constants";
 import { SetStateAction, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoClose, IoMenu } from "react-icons/io5";
-import Logo from "/assets/images/logo.webp";
-import { BookTableBtn } from "./Button";
+import Logo from "/assets/images/navbar/logo.webp";
+// import Logo from "/assets/images/navbar/logo.jpg";
+import { StartedBtn } from "./Button";
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -56,18 +57,18 @@ function Navbar() {
 
   return (
     <div
-      className={`flex justify-center w-full items-center bg-[#0a1117]  ${
-        hasScrolled ? "backdrop-blur-lg shadow-md" : ""
+      className={`sticky top-0 flex justify-center w-full items-center bg-[#0a1117] z-50 ${
+        hasScrolled ? "backdrop-blur-lg shadow-md border-b border-b-gray-500" : ""
       }`}
     >
       <div
-        className={`flex items-center justify-between px-4 sm:px-8 md:px-8 py-3 w-full mx-auto max-w-[1920px] transition-all duration-300 z-30 relative`}
+        className={`flex items-center justify-between px-4 sm:px-8 md:px-8 w-full mx-auto max-w-[1920px] transition-all duration-300 z-30 relative`}
       >
         <div className="flex">
           <img
             src={Logo}
             alt="logo"
-            className="cursor-pointer w-14 xl:w-1/2"
+            className="cursor-pointer w-14 xl:w-1/3 hover:animate-rotate-y"
             onClick={handleLogoClick}
           />
         </div>
@@ -75,11 +76,11 @@ function Navbar() {
           {navItems.map((item) => (
             <ul
               key={item.id}
-              className={`text-sm lg:text-lg px-6 xl:px-10 py-2 cursor-pointer 
+              className={`text-sm lg:text-base px-6 xl:px-10 py-2 uppercase font-midsun font-semibold
                   ${
                     activeNavItem === item.id
                       ? "border-white text-[#41B7FC]"
-                      : "border-transparent text-white hover:text-[#41B7FC]"
+                      : "border-transparent text-white hover:text-[#41B7FC] cursor-pointer hover:scale-105"
                   }`}
               onClick={() => handleNavClick(item.id)}
             >
@@ -91,7 +92,7 @@ function Navbar() {
           <div>
             <div className="flex gap-2 text-white uppercase sm:gap-4">
               <div className="flex items-center justify-center rounded-sm sm:order-last">
-                <BookTableBtn />
+                <StartedBtn />
               </div>
               <div className="relative"></div>
             </div>
@@ -112,7 +113,7 @@ function Navbar() {
             {navItems.map((item) => (
               <ul
                 key={item.id}
-                className={`text-sm lg:text-base border-2 rounded-2xl px-8 lg:px-6 xl:px-8 py-2 cursor-pointer font-midsun 
+                className={`text-sm lg:text-base border-2 rounded-2xl px-8 lg:px-6 xl:px-8 py-2 cursor-pointer font-midsun
                     ${
                       activeNavItem === item.id
                         ? "border-white text-[#41B7FC]"
