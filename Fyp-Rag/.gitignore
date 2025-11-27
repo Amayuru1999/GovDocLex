@@ -5,3 +5,4 @@ venv/
 .idea
 .DS_Store
 chroma_storage
+/legal_bert_embeddings.pkl
