@@ -56,7 +56,7 @@ function Navbar() {
 
   return (
     <div
-      className={`flex justify-center w-full items-center bg-[#0a1117] ${
+      className={`flex justify-center w-full items-center bg-[#0a1117]  ${
         hasScrolled ? "backdrop-blur-lg shadow-md" : ""
       }`}
     >
@@ -127,6 +127,8 @@ function Navbar() {
         )}
       </div>
     </div>
+
+    
   );
 }
 
