@@ -1,9 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { Mic, Paperclip, Send, Sparkles } from "lucide-react";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
-import { Card, CardContent } from "../ui/Card";
 import axios from "axios";
 import { FormEvent } from "react";
 import { chatService } from "../../services/chatService";
@@ -28,40 +26,10 @@ interface MainChatProps {
   onSessionChange?: (sessionId: string) => void;
 }
 
-function MainChat({ sessionId: propSessionId, onSessionChange }: MainChatProps) {
-  const quickActions = [
-    {
-      label: "Upload Documents",
-      sub: "Add your own documents",
-      action: () => setIsUploadModalOpen(true),
-    },
-    {
-      label: "Government structure",
-      sub: "Explore Government hierarchy",
-      action: () => setMessage("Tell me about the Sri Lankan government structure"),
-    },
-    {
-      label: "Smart Search",
-      sub: "Find notes instantly",
-      action: () => setMessage("How can I search for specific laws and acts?"),
-    },
-    {
-      label: "Organized Categories",
-      sub: "Navigate by folder",
-      action: () => setMessage("Show me the different categories of Sri Lankan laws"),
-    },
-    {
-      label: "Trending Notes",
-      sub: "See popular materials",
-      action: () => setMessage("What are the most commonly referenced acts in Sri Lanka?"),
-    },
-    {
-      label: "Save & Bookmark",
-      sub: "Quick access later",
-      action: () => setMessage("How can I save and bookmark important legal information?"),
-    },
-  ];
-
+function MainChat({
+  sessionId: propSessionId,
+  onSessionChange,
+}: MainChatProps) {
   const [message, setMessage] = useState("");
   const [responses, setResponses] = useState<ChatEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -105,11 +73,13 @@ function MainChat({ sessionId: propSessionId, onSessionChange }: MainChatProps) 
         try {
           const history = await chatService.getChatHistory(currentSessionId);
           if (history.success && history.data.messages.length > 0) {
-            const formattedMessages: ChatEntry[] = history.data.messages.map(msg => ({
-              user: msg.userMessage,
-              bot: msg.botResponse,
-              sources: msg.sources
-            }));
+            const formattedMessages: ChatEntry[] = history.data.messages.map(
+              (msg) => ({
+                user: msg.userMessage,
+                bot: msg.botResponse,
+                sources: msg.sources,
+              })
+            );
             setResponses(formattedMessages);
           } else {
             // Clear responses for new/empty sessions
@@ -148,7 +118,10 @@ function MainChat({ sessionId: propSessionId, onSessionChange }: MainChatProps) 
       ]);
 
       // Use the chat service
-      const botResponse = await chatService.sendMessage(message, currentSessionId || undefined);
+      const botResponse = await chatService.sendMessage(
+        message,
+        currentSessionId || undefined
+      );
 
       console.log("Bot response:", botResponse.data.response);
 
@@ -171,8 +144,10 @@ function MainChat({ sessionId: propSessionId, onSessionChange }: MainChatProps) 
     } catch (err) {
       // Handle specific error messages
       if (err instanceof Error) {
-        if (err.message.includes("No authentication token found") || 
-            err.message.includes("Not authorized")) {
+        if (
+          err.message.includes("No authentication token found") ||
+          err.message.includes("Not authorized")
+        ) {
           setError("Session expired. Please log in again.");
           // Optionally redirect to login or clear localStorage
           chatService.handleAuthError();
@@ -205,23 +180,25 @@ function MainChat({ sessionId: propSessionId, onSessionChange }: MainChatProps) 
       <div className="mb-4 sm:mb-6 md:mb-8">
         {responses.map((r, i) => (
           <div key={i} className="mb-3">
-            <div className="ml-auto w-fit bg-[#2EF2B8]/10 border border-[#2EF2B8]/20 rounded-lg px-4 py-2 mb-2 text-xl">
+            <div className="ml-auto w-fit bg-[#2EF2B8]/10 border border-[#2EF2B8]/20 rounded-xl px-4 py-2 mb-2 text-sm">
               {r.user}
             </div>
 
             {r.bot && (
-              <div className="bg-[#0D1520]/70 border border-[#34495E]/40 rounded-lg px-4 py-2 whitespace-pre-line text-xl">
+              <div className=" px-4 py-2 whitespace-pre-line text-sm">
                 {typeof r.bot === "string" ? r.bot : JSON.stringify(r.bot)}
               </div>
             )}
           </div>
         ))}
         {error && (
-          <div className={`text-sm mb-2 p-3 rounded ${
-            error.includes("log in") || error.includes("expired") 
-              ? "text-yellow-400 bg-yellow-900/20 border border-yellow-600/30" 
-              : "text-red-400 bg-red-900/20 border border-red-600/30"
-          }`}>
+          <div
+            className={`text-sm mb-2 p-3 rounded ${
+              error.includes("log in") || error.includes("expired")
+                ? "text-yellow-400 bg-yellow-900/20 border border-yellow-600/30"
+                : "text-red-400 bg-red-900/20 border border-red-600/30"
+            }`}
+          >
             {error}
           </div>
         )}
@@ -240,8 +217,8 @@ function MainChat({ sessionId: propSessionId, onSessionChange }: MainChatProps) 
           />
           <div className="flex items-center gap-2">
             <div title="Upload documents">
-              <Paperclip 
-                className="cursor-pointer opacity-70 hover:opacity-100 w-4 sm:w-5" 
+              <Paperclip
+                className="cursor-pointer opacity-70 hover:opacity-100 w-4 sm:w-5"
                 onClick={() => setIsUploadModalOpen(true)}
               />
             </div>
@@ -263,7 +240,7 @@ function MainChat({ sessionId: propSessionId, onSessionChange }: MainChatProps) 
       </form>
 
       {/* Quick actions */}
-      <div className="mt-6 xl:mt-8 grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      {/* <div className="mt-6 xl:mt-8 grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {quickActions.map((qa) => (
           <Card
             key={qa.label}
@@ -278,7 +255,7 @@ function MainChat({ sessionId: propSessionId, onSessionChange }: MainChatProps) 
             </CardContent>
           </Card>
         ))}
-      </div>
+      </div> */}
 
       {/* Document Upload Modal */}
       <DocumentUploadModal
@@ -286,7 +263,7 @@ function MainChat({ sessionId: propSessionId, onSessionChange }: MainChatProps) 
         onClose={() => setIsUploadModalOpen(false)}
         onUploadSuccess={() => {
           // Optional: Add any success handling here
-          console.log('Documents uploaded successfully');
+          console.log("Documents uploaded successfully");
         }}
       />
     </div>
