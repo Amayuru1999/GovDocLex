@@ -25,17 +25,17 @@ export default function ConfirmationModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl p-10 max-w-sm w-full mx-4 shadow-xl">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ">
+      <div className="bg-gray-900 rounded-2xl p-10 max-w-sm w-full mx-4 shadow-xl ">
         <div className="text-center">
           <div className="mb-4">
             {/* <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
               {icon || defaultIcon}
             </div> */}
-            <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+            <h3 className="text-2xl font-semibold text-white mb-2">
               {title}
             </h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm white">
               {message}
             </p>
           </div>

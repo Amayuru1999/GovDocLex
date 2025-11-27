@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import gsap from "gsap";
 import Court from "../../assets/images/rotatingimg.png";
 
+
 function Hero() {
   useEffect(() => {
     gsap.to("#rotating-element", {
@@ -14,6 +15,7 @@ function Hero() {
 
   return (
     <div className="flex max-w-[1920px] mx-auto mt-10 md:mt-0">
+      
       <div className="flex flex-col justify-center gap-3 lg:gap-4 lg:w-3/4">
         <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFFFFF] to-[#FFFFFF]/50 font-sfpro text-4xl md:text-6xl px-4 ">
           AI-Powered Extraction & Reasoning for Sri Lankan Government Documents
