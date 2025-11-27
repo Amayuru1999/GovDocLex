@@ -1,20 +1,7 @@
-.env
-legal_bert_embeddings.pkl
-openai_api_key.txt
-chromadb/
-chroma_storage/legal_db
-# Ignore Python cache files
-__pycache__/
-# Ignore environment variables
-.env
-# Ignore log files
-*.log
-# Ignore virtual environment directories
 venv/
-Ministry Of Defence
+**/node_modules/
+# **/dist/
+.env
 .idea
-
-# Ignore SQLite databases
-*.sqlite3
-*.sqlite
-*.db
+.DS_Store
+chroma_storage

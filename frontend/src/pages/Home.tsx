@@ -1,6 +1,5 @@
 import About from "@/section/home/About";
 import Hero from "@/section/home/Home";
-
 import KeyFeatures from "@/section/KeyFeatures";
 import TrackEverything from "@/section/TrackEverything";
 import GovDocLexFeatures from "@/section/SmartExtraction";
@@ -13,7 +12,7 @@ const Home = () => {
       <section id="home">
         <Hero />
       </section>
-      
+
       <section id="about">
         <About />
       </section>

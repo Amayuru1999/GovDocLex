@@ -1,0 +1,204 @@
+try:
+    from langchain_openai import ChatOpenAI
+except ImportError:
+    from langchain_community.chat_models import ChatOpenAI
+from langchain_core.prompts import PromptTemplate
+import re
+from typing import List, Dict, Tuple
+from collections import Counter
+
+
+class EnhancedQuestionGenerator:
+    def __init__(self):
+        self.llm = ChatOpenAI(temperature=0.5)
+        self.quality_llm = ChatOpenAI(temperature=0.1)
+        
+        # Legal domain patterns for Sri Lankan law
+        self.legal_domains = {
+            'civil': ['contract', 'property', 'tort', 'family', 'inheritance'],
+            'criminal': ['offense', 'penalty', 'punishment', 'crime', 'violation'],
+            'commercial': ['business', 'company', 'trade', 'commerce', 'corporate'],
+            'constitutional': ['rights', 'fundamental', 'constitution', 'government'],
+            'procedural': ['procedure', 'court', 'appeal', 'jurisdiction', 'evidence']
+        }
+        
+        # Question templates by domain
+        self.domain_templates = {
+            'civil': [
+                "What are the legal requirements for {topic}?",
+                "What are the consequences of violating {topic} provisions?",
+                "How does {topic} affect parties' rights and obligations?",
+                "What remedies are available under {topic}?"
+            ],
+            'criminal': [
+                "What constitutes an offense under {topic}?",
+                "What are the penalties for {topic} violations?",
+                "What are the procedural requirements for {topic}?",
+                "What defenses are available for {topic} charges?"
+            ],
+            'commercial': [
+                "What are the compliance requirements for {topic}?",
+                "How does {topic} affect business operations?",
+                "What are the registration/licensing requirements for {topic}?",
+                "What are the financial implications of {topic}?"
+            ],
+            'constitutional': [
+                "What fundamental rights are involved in {topic}?",
+                "How does {topic} balance individual and state interests?",
+                "What are the constitutional limitations on {topic}?",
+                "What judicial review standards apply to {topic}?"
+            ],
+            'procedural': [
+                "What are the step-by-step procedures for {topic}?",
+                "What are the time limitations for {topic}?",
+                "What documentation is required for {topic}?",
+                "What are the appeal processes for {topic}?"
+            ]
+        }
+
+    def analyze_question_complexity(self, question: str) -> int:
+        """Determine optimal number of mini-questions based on complexity."""
+        complexity_indicators = {
+            'multiple_concepts': len(re.findall(r'\band\b|\bor\b', question.lower())),
+            'legal_terms': len([word for word in question.lower().split() 
+                              if any(term in word for domain_terms in self.legal_domains.values() 
+                                   for term in domain_terms)]),
+            'question_length': len(question.split()),
+            'specific_acts': len(re.findall(r'\bact\b|\blaw\b|\bcode\b', question.lower()))
+        }
+        
+        base_score = 3  # Minimum questions
+        complexity_score = (
+            complexity_indicators['multiple_concepts'] * 2 +
+            complexity_indicators['legal_terms'] * 1 +
+            (complexity_indicators['question_length'] // 10) +
+            complexity_indicators['specific_acts'] * 2
+        )
+        
+        return min(max(base_score + complexity_score, 3), 10)  # 3-10 range
+
+    def identify_legal_domain(self, question: str) -> str:
+        """Identify the primary legal domain of the question."""
+        question_lower = question.lower()
+        domain_scores = {}
+        
+        for domain, keywords in self.legal_domains.items():
+            score = sum(1 for keyword in keywords if keyword in question_lower)
+            domain_scores[domain] = score
+        
+        return max(domain_scores, key=domain_scores.get) if max(domain_scores.values()) > 0 else 'general'
+
+    def generate_domain_specific_questions(self, question: str, domain: str, num_questions: int) -> List[str]:
+        """Generate questions using domain-specific templates."""
+        if domain not in self.domain_templates:
+            return []
+        
+        # Extract key topics from the question
+        topics = self.extract_key_topics(question)
+        templates = self.domain_templates[domain]
+        
+        domain_questions = []
+        for i, template in enumerate(templates[:num_questions//2]):
+            if i < len(topics):
+                domain_questions.append(template.format(topic=topics[i]))
+        
+        return domain_questions
+
+    def extract_key_topics(self, question: str) -> List[str]:
+        """Extract key legal topics from the question."""
+        # Simple extraction - can be enhanced with NER
+        words = question.lower().split()
+        legal_terms = []
+        
+        for i, word in enumerate(words):
+            if any(term in word for domain_terms in self.legal_domains.values() 
+                   for term in domain_terms):
+                # Include context around legal terms
+                context_start = max(0, i-1)
+                context_end = min(len(words), i+2)
+                context = ' '.join(words[context_start:context_end])
+                legal_terms.append(context)
+        
+        return legal_terms[:3] if legal_terms else [question]
+
+    def score_question_quality(self, mini_question: str, original_question: str) -> float:
+        """Score the quality of a generated mini-question."""
+        prompt = PromptTemplate.from_template(
+            """Rate the quality of this mini-question for helping answer the original legal question. 
+            Consider relevance, specificity, and potential to retrieve useful information.
+            
+            Original question: {original}
+            Mini-question: {mini}
+            
+            Rate from 1-10 (10 being highest quality). Output only the number."""
+        )
+        
+        try:
+            response = self.quality_llm.invoke(
+                prompt.format(original=original_question, mini=mini_question)
+            ).content.strip()
+            return float(re.findall(r'\d+', response)[0]) / 10.0
+        except:
+            return 0.5  # Default score if scoring fails
+
+    def generate_mini_questions(self, user_question: str) -> List[str]:
+        """Enhanced mini-question generation with adaptive count and quality scoring."""
+        # Determine optimal number of questions
+        num_mini = self.analyze_question_complexity(user_question)
+        
+        # Identify legal domain
+        domain = self.identify_legal_domain(user_question)
+        
+        # Generate domain-specific questions
+        domain_questions = self.generate_domain_specific_questions(user_question, domain, num_mini)
+        
+        # Generate general decomposition questions
+        general_prompt = PromptTemplate.from_template(
+            """You are an expert legal question decomposer for Sri Lankan law. 
+            Generate {num} diverse mini-questions that will help comprehensively answer the main question.
+            Focus on different aspects: definitions, requirements, procedures, consequences, exceptions, and related provisions.
+            
+            Main question: {question}
+            Legal domain: {domain}
+            
+            Generate specific, actionable questions that will retrieve relevant legal information.
+            Output only the questions, one per line."""
+        )
+        
+        response = self.llm.invoke(
+            general_prompt.format(
+                question=user_question, 
+                num=num_mini - len(domain_questions),
+                domain=domain
+            )
+        ).content
+        
+        general_questions = [q.strip() for q in response.split("\n") if q.strip()]
+        
+        # Combine and deduplicate
+        all_questions = domain_questions + general_questions
+        unique_questions = list(dict.fromkeys(all_questions))  # Preserve order while removing duplicates
+        
+        # Score and filter questions
+        scored_questions = []
+        for q in unique_questions[:num_mini * 2]:  # Generate extra for filtering
+            score = self.score_question_quality(q, user_question)
+            scored_questions.append((q, score))
+        
+        # Sort by score and take top questions
+        scored_questions.sort(key=lambda x: x[1], reverse=True)
+        final_questions = [q for q, score in scored_questions[:num_mini] if score > 0.3]
+        
+        # Ensure minimum number of questions
+        if len(final_questions) < 3:
+            final_questions.extend([q for q, _ in scored_questions[len(final_questions):3]])
+        
+        return final_questions
+
+
+# Global instance for backward compatibility
+_generator = EnhancedQuestionGenerator()
+
+def generate_mini_questions(user_question: str, num_mini: int = None) -> List[str]:
+    """Backward compatible function that uses the enhanced generator."""
+    return _generator.generate_mini_questions(user_question)
