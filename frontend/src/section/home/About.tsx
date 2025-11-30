@@ -17,7 +17,6 @@ function About() {
 
   return (
     <div className="py-4 xsm:p-6 sm:p-12 md:p-20 relative max-w-[1920px] mx-auto mt-10 md:mt-0">
-      Green ball background accent
       <img
         src={greenball}
         alt="greenball"
