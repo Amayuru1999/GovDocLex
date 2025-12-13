@@ -23,7 +23,8 @@ const CommonButton = ({ text, link }: CommonButtonProps) => {
         w-[130px] md:w-[175px]
         px-4 py-2 md:py-2.5
         rounded-2xl md:rounded-3xl
-        border-2 border-transparent
+        border border-transparent
+        overflow-hidden bg-clip-padding
         shadow-md
         transition-all duration-300 ease-in-out
         hover:text-[#0A1D33] hover:scale-105

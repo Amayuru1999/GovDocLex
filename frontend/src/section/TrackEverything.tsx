@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import whytheseimg from "../assets/images/search.gif";
-import squareback from "../assets/images/squareback.png";
+
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -18,20 +18,10 @@ const FeatureHighlightSection = () => {
 
   return (
     <section
-      className="bg-[radial-gradient(circle,_#1f2937_1px,_transparent_1px)]
-                 [background-size:20px_20px] bg-[#0b0f14]
-                 py-16 px-4 text-white flex flex-col justify-center items-center
-                 relative overflow-hidden"
+      className="py-16 px-4 text-white flex flex-col justify-center items-center relative"
     >
       
-      <img
-        src={squareback}
-        alt="squareback"
-        aria-hidden
-        className="hidden sm:block absolute z-0 w-[400px] lg:w-[600px] xl:w-[1800px]
-                   left-1/2 top-[72%] -translate-x-1/2 -translate-y-1/2
-                   pointer-events-none select-none opacity-60"
-      />
+
 
       <div className="relative z-10 mx-auto grid md:grid-cols-2 gap-10 items-center">
         {/* Left Column */}

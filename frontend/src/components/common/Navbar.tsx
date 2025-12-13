@@ -2,8 +2,7 @@ import { navItems } from "@/constants/navItems.constants";
 import { SetStateAction, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoClose, IoMenu } from "react-icons/io5";
-import Logo from "/assets/images/navbar/logo.webp";
-// import Logo from "/assets/images/navbar/logo.jpg";
+import Logo from "/assets/images/navbar/logo-removebg-preview.png";
 import { StartedBtn } from "./Button";
 
 function Navbar() {
@@ -52,12 +51,12 @@ function Navbar() {
 
   const handleLogoClick = () => {
     navigate("/");
-    window.scrollTo(0, 0); // Scroll to top after navigation
+    window.scrollTo(0, 0);
   };
 
   return (
     <div
-      className={`sticky top-0 flex justify-center w-full items-center bg-[#0a1117] z-50 ${
+      className={`sticky top-0 flex justify-center w-full items-center z-50 ${
         hasScrolled ? "backdrop-blur-lg shadow-md border-b border-b-gray-500" : ""
       }`}
     >
@@ -68,7 +67,7 @@ function Navbar() {
           <img
             src={Logo}
             alt="logo"
-            className="cursor-pointer w-14 xl:w-1/3 hover:animate-rotate-y"
+            className="cursor-pointer w-14 xl:w-1/3 hover:animate-rotate-y mix-blend-screen"
             onClick={handleLogoClick}
           />
         </div>
@@ -90,7 +89,7 @@ function Navbar() {
         </div>
         <div className="flex flex-row items-center space-x-2">
           <div>
-            <div className="flex gap-2 text-white uppercase sm:gap-4">
+            <div className="hidden md:flex gap-2 text-white uppercase sm:gap-4">
               <div className="flex items-center justify-center rounded-sm sm:order-last">
                 <StartedBtn />
               </div>
@@ -109,7 +108,7 @@ function Navbar() {
           </div>
         </div>
         {isMenuOpen && (
-          <div className="absolute top-full left-0 right-0 bg-[#060A0B] md:hidden z-40 flex flex-col items-center p-2">
+          <div className="absolute top-full left-0 right-0 backdrop-blur-md md:hidden z-40 flex flex-col items-center p-2">
             {navItems.map((item) => (
               <ul
                 key={item.id}

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import KeyFeaturesCard from "../components/Cards/KeyFeaturesCard";
 import iconimg from "../assets/images/icon.png";
-import greenback from "../assets/images/greenback.png"; // Adjust the path as necessary
+
 import gsap from "gsap";
 
 const KeyFeaturesSection: React.FC = () => {
@@ -19,7 +19,7 @@ const KeyFeaturesSection: React.FC = () => {
 
   return (
     <section
-      className="py-10  flex flex-col justify-center items-center bg-[#0b1016]  relative "
+      className="py-10  flex flex-col justify-center items-center   relative "
       // style={{
       //   background: 'radial-gradient(circle, black 0%, #065f46 50%, black 100%)',
       // }}
@@ -44,12 +44,7 @@ const KeyFeaturesSection: React.FC = () => {
           <span className="text-cyan-400">Legal Documents</span>
         </h2>
 
-        <img
-          src={greenback}
-          alt="greenball"
-          className="hidden sm:block absolute z-0 w-[400px] lg:w-[600px] xl:w-[1800px] 
-             left-1/2 top-[58%] transform -translate-x-1/2 -translate-y-1/2 opacity-70"
-        />
+
 
         <div className="  items-center  flex justify-center">
           <div className="grid grid-cols-1 sm:grid-cols-2  gap-10 p-4  ">

@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import Court from "../../assets/images/rotatingimg.png";
-import Banner from "/assets/images/hero/hero-banner.png";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -32,16 +31,24 @@ function Hero() {
   }, []);
 
   return (
-    <div>
-      <div>
-        <img
-          src={Banner}
-          alt="Banner"
-          className="w-full h-[400px] rounded-3xl"
+    <div className="relative min-h-screen">
+      {/* Transparent Video Background - Fixed to cover navbar too */}
+      <div className="fixed top-0 left-0 w-full h-screen overflow-hidden z-0">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover opacity-30"
           data-aos="zoom-in"
-        />
+        >
+          <source src="/1130.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
       </div>
-      <div className="flex max-w-[1920px] mx-auto mt-10 md:mt-0">
+
+      {/* Content on top of video */}
+      <div className="relative z-10 flex max-w-[1920px] mx-auto pt-10 md:pt-20">
         <div className="flex flex-col justify-center gap-3 lg:gap-4 lg:w-3/4">
           <h1
             ref={textRef}
