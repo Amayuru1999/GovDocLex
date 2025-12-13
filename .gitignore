@@ -4,4 +4,6 @@ rag/.venv/
 .env
 .idea
 .DS_Store
-chroma_storage
+chroma_storagevideo/
+*.mp4
+video/
