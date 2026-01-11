@@ -216,13 +216,7 @@ function MainChat({
             disabled={isLoading}
           />
           <div className="flex items-center gap-2">
-            <div title="Upload documents">
-              <Paperclip
-                className="cursor-pointer opacity-70 hover:opacity-100 w-4 sm:w-5"
-                onClick={() => setIsUploadModalOpen(true)}
-              />
-            </div>
-            <Mic className="cursor-pointer opacity-70 hover:opacity-100 w-4 sm:w-5" />
+          
             <Button
               type="submit"
               variant="ghost"
